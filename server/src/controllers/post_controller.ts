@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Post from "../models/post_model";
+import mongoose from "mongoose";
 
 const parseIntSafe = (value: any, fallback: number) => {
   const n = Number.parseInt(String(value), 10);
@@ -44,7 +45,8 @@ const getPosts = async (req: Request, res: Response) => {
       .populate("owner", "_id username image")
       .select("_id owner text image likes commentsCount createdAt updatedAt");
 
-    // כדי לא להעביר מערך likes כבד, מחזירים likesCount
+    const viewerId = (req as any).user?._id ? String((req as any).user._id) : null;
+
     const response = posts.map((p: any) => ({
       _id: p._id,
       owner: p.owner,
@@ -52,6 +54,7 @@ const getPosts = async (req: Request, res: Response) => {
       image: p.image,
       commentsCount: p.commentsCount,
       likesCount: Array.isArray(p.likes) ? p.likes.length : 0,
+      likedByMe: viewerId ? (p.likes || []).some((id: any) => String(id) === viewerId) : false,
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
     }));
@@ -77,6 +80,8 @@ const getMyPosts = async (req: Request, res: Response) => {
       .populate("owner", "_id username image")
       .select("_id owner text image likes commentsCount createdAt updatedAt");
 
+    const viewerId = String(userId);
+
     const response = posts.map((p: any) => ({
       _id: p._id,
       owner: p.owner,
@@ -84,6 +89,7 @@ const getMyPosts = async (req: Request, res: Response) => {
       image: p.image,
       commentsCount: p.commentsCount,
       likesCount: Array.isArray(p.likes) ? p.likes.length : 0,
+      likedByMe: (p.likes || []).some((id: any) => String(id) === viewerId),
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
     }));
@@ -103,9 +109,7 @@ const updatePost = async (req: Request, res: Response) => {
     const post = await Post.findById(id);
     if (!post) return res.status(404).send("Post not found");
 
-    if (String(post.owner) !== String(userId)) {
-      return res.status(403).send("Not allowed");
-    }
+    if (String(post.owner) !== String(userId)) return res.status(403).send("Not allowed");
 
     const { text } = req.body as { text?: string };
     const file = (req as any).file as Express.Multer.File | undefined;
@@ -125,9 +129,7 @@ const updatePost = async (req: Request, res: Response) => {
       post.text = trimmed;
     }
 
-    if (hasImageUpdate) {
-      post.image = imagePath!;
-    }
+    if (hasImageUpdate) post.image = imagePath!;
 
     await post.save();
 
@@ -147,9 +149,7 @@ const deletePost = async (req: Request, res: Response) => {
     const post = await Post.findById(id);
     if (!post) return res.status(404).send("Post not found");
 
-    if (String(post.owner) !== String(userId)) {
-      return res.status(403).send("Not allowed");
-    }
+    if (String(post.owner) !== String(userId)) return res.status(403).send("Not allowed");
 
     await Post.findByIdAndDelete(id);
     return res.status(200).send("Deleted");
@@ -158,4 +158,43 @@ const deletePost = async (req: Request, res: Response) => {
   }
 };
 
-export default { createPost, getPosts, getMyPosts, updatePost, deletePost };
+const toggleLike = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?._id as string | undefined;
+    if (!userId) return res.status(401).send("Access Denied");
+
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) return res.status(400).send("Invalid post id");
+
+    const post = await Post.findById(id).select("_id likes");
+    if (!post) return res.status(404).send("Post not found");
+
+    const alreadyLiked = (post.likes || []).some((uid: any) => String(uid) === String(userId));
+
+    const update = alreadyLiked
+      ? { $pull: { likes: userId } }
+      : { $addToSet: { likes: userId } };
+
+    const updated = await Post.findByIdAndUpdate(
+      id,
+      update,
+      { returnDocument: "after" }
+    ).select("_id likes");
+
+    const likesCount = updated?.likes?.length || 0;
+    const likedByMe = !alreadyLiked;
+
+    return res.status(200).json({ postId: id, likesCount, likedByMe });
+  } catch {
+    return res.status(500).send("Server error");
+  }
+};
+
+export default {
+  createPost,
+  getPosts,
+  getMyPosts,
+  updatePost,
+  deletePost,
+  toggleLike,
+};

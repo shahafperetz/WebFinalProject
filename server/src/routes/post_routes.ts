@@ -24,12 +24,10 @@ const router = express.Router();
  *         name: skip
  *         schema:
  *           type: integer
- *           example: 0
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *           example: 10
  *     responses:
  *       200:
  *         description: Feed posts
@@ -40,22 +38,10 @@ router.get("/", postController.getPosts);
  * @swagger
  * /posts/my:
  *   get:
- *     summary: Get my posts with paging (skip/limit)
+ *     summary: Get my posts with paging
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: skip
- *         schema:
- *           type: integer
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: My posts
  */
 router.get("/my", authMiddleware, postController.getMyPosts);
 
@@ -63,7 +49,7 @@ router.get("/my", authMiddleware, postController.getMyPosts);
  * @swagger
  * /posts:
  *   post:
- *     summary: Create a post (text required, image optional)
+ *     summary: Create a post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
@@ -80,9 +66,6 @@ router.get("/my", authMiddleware, postController.getMyPosts);
  *               image:
  *                 type: string
  *                 format: binary
- *     responses:
- *       201:
- *         description: Post created
  */
 router.post(
   "/",
@@ -96,35 +79,10 @@ router.post(
  * @swagger
  * /posts/{id}:
  *   put:
- *     summary: Update my post (text and/or image)
+ *     summary: Update my post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: false
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               text:
- *                 type: string
- *               image:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Post updated
- *       403:
- *         description: Not allowed
- *       404:
- *         description: Post not found
  */
 router.put(
   "/:id",
@@ -142,20 +100,18 @@ router.put(
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Deleted
- *       403:
- *         description: Not allowed
- *       404:
- *         description: Post not found
  */
 router.delete("/:id", authMiddleware, postController.deletePost);
+
+/**
+ * @swagger
+ * /posts/{id}/like:
+ *   post:
+ *     summary: Toggle like on a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.post("/:id/like", authMiddleware, postController.toggleLike);
 
 export default router;

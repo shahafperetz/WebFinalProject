@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth_routes";
 import userRoutes from "./routes/user_routes";
 import postRoutes from "./routes/post_routes";
+import commentRoutes from "./routes/comment_routes";
 
 dotenv.config();
 
@@ -62,6 +63,7 @@ const specs = swaggerJsDoc(options);
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
+app.use("/", commentRoutes);
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 // DB

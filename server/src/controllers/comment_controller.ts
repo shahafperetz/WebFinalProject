@@ -1,0 +1,65 @@
+import { Request, Response } from "express";
+import mongoose from "mongoose";
+import Comment from "../models/comment_model";
+import Post from "../models/post_model";
+
+const parseIntSafe = (value: any, fallback: number) => {
+  const n = Number.parseInt(String(value), 10);
+  return Number.isFinite(n) && n >= 0 ? n : fallback;
+};
+
+const addComment = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?._id as string | undefined;
+    if (!userId) return res.status(401).send("Access Denied");
+
+    const { postId } = req.params;
+    if (!mongoose.isValidObjectId(postId)) return res.status(400).send("Invalid post id");
+
+    const { text } = req.body as { text?: string };
+    if (!text || text.trim().length === 0) return res.status(400).send("Text is required");
+
+    const postExists = await Post.exists({ _id: postId });
+    if (!postExists) return res.status(404).send("Post not found");
+
+    const comment = await Comment.create({
+      postId,
+      owner: userId,
+      text: text.trim(),
+    });
+
+    // עדכון מונה תגובות בפוסט כדי להציג בפיד
+    await Post.findByIdAndUpdate(postId, { $inc: { commentsCount: 1 } });
+
+    const populated = await Comment.findById(comment._id)
+      .populate("owner", "_id username image")
+      .select("_id postId owner text createdAt updatedAt");
+
+    return res.status(201).json(populated);
+  } catch {
+    return res.status(500).send("Server error");
+  }
+};
+
+const getCommentsByPost = async (req: Request, res: Response) => {
+  try {
+    const { postId } = req.params;
+    if (!mongoose.isValidObjectId(postId)) return res.status(400).send("Invalid post id");
+
+    const skip = parseIntSafe(req.query.skip, 0);
+    const limit = Math.min(parseIntSafe(req.query.limit, 20), 50);
+
+    const comments = await Comment.find({ postId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("owner", "_id username image")
+      .select("_id postId owner text createdAt updatedAt");
+
+    return res.status(200).json({ skip, limit, items: comments });
+  } catch {
+    return res.status(500).send("Server error");
+  }
+};
+
+export default { addComment, getCommentsByPost };
