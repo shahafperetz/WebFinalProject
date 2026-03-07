@@ -42,6 +42,10 @@ export function Navbar() {
                 </RouterLink>
               </Button>
 
+              <Button asChild variant="ghost">
+                <RouterLink to="/my-posts">My Posts</RouterLink>
+              </Button>
+
               <Text color="gray.600">{user?.username}</Text>
 
               <Button
