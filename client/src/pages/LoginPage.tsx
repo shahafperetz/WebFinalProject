@@ -1,15 +1,17 @@
-import { Box, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
+import { PageHeader } from "../components/common/PageHeader";
+import { LoginForm } from "../features/auth/components/LoginForm";
 
 export function LoginPage() {
   return (
-    <VStack align="start" gap={4}>
-      <Heading>Login</Heading>
-
-      <Text color="gray.600">כאן יבוא טופס התחברות.</Text>
+    <Box maxW="md">
+      <PageHeader
+        title="Login"
+        subtitle="Sign in to continue to the application"
+      />
 
       <Box
         w="full"
-        maxW="md"
         p={6}
         bg="white"
         borderRadius="xl"
@@ -17,8 +19,12 @@ export function LoginPage() {
         border="1px solid"
         borderColor="gray.200"
       >
-        <Text>טופס התחברות ייכנס כאן בשלב הבא.</Text>
+        <LoginForm />
       </Box>
-    </VStack>
+
+      <Text mt={4} color="gray.600">
+        בהמשך נוסיף כאן גם התחברות עם Google או Facebook.
+      </Text>
+    </Box>
   );
 }
