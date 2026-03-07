@@ -1,7 +1,21 @@
-import { Box, Button, Flex, HStack, Heading, Spacer } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Heading,
+  Spacer,
+  Text,
+} from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
+import { useAuthStore } from "../../store/auth.store";
+import { useAuth } from "../../features/auth/hooks/useAuth";
 
 export function Navbar() {
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { logoutMutation } = useAuth();
+
   return (
     <Box
       bg="white"
@@ -20,13 +34,35 @@ export function Navbar() {
             <RouterLink to="/">Home</RouterLink>
           </Button>
 
-          <Button asChild variant="ghost">
-            <RouterLink to="/login">Login</RouterLink>
-          </Button>
+          {isAuthenticated ? (
+            <>
+              <Button asChild variant="ghost">
+                <RouterLink to={`/profile/${user?.id ?? ""}`}>
+                  Profile
+                </RouterLink>
+              </Button>
 
-          <Button asChild colorPalette="blue">
-            <RouterLink to="/register">Register</RouterLink>
-          </Button>
+              <Text color="gray.600">{user?.username}</Text>
+
+              <Button
+                variant="outline"
+                onClick={() => logoutMutation.mutate()}
+                loading={logoutMutation.isPending}
+              >
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild variant="ghost">
+                <RouterLink to="/login">Login</RouterLink>
+              </Button>
+
+              <Button asChild colorPalette="blue">
+                <RouterLink to="/register">Register</RouterLink>
+              </Button>
+            </>
+          )}
         </HStack>
       </Flex>
     </Box>

@@ -1,15 +1,17 @@
-import { Box, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
+import { PageHeader } from "../components/common/PageHeader";
+import { RegisterForm } from "../features/auth/components/RegisterForm";
 
 export function RegisterPage() {
   return (
-    <VStack align="start" gap={4}>
-      <Heading>Register</Heading>
-
-      <Text color="gray.600">כאן יבוא טופס הרשמה.</Text>
+    <Box maxW="md">
+      <PageHeader
+        title="Register"
+        subtitle="Create a new account to start sharing content"
+      />
 
       <Box
         w="full"
-        maxW="md"
         p={6}
         bg="white"
         borderRadius="xl"
@@ -17,8 +19,12 @@ export function RegisterPage() {
         border="1px solid"
         borderColor="gray.200"
       >
-        <Text>טופס הרשמה ייכנס כאן בשלב הבא.</Text>
+        <RegisterForm />
       </Box>
-    </VStack>
+
+      <Text mt={4} color="gray.600">
+        בהמשך נוסיף כאן גם הרשמה עם Google או Facebook.
+      </Text>
+    </Box>
   );
 }
