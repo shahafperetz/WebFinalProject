@@ -7,6 +7,14 @@ type AuthState = {
   isAuthenticated: boolean;
   setAuth: (user: User, accessToken: string) => void;
   clearAuth: () => void;
+  hydrateAuth: () => void;
+};
+
+const AUTH_STORAGE_KEY = "social-ai-auth";
+
+type PersistedAuth = {
+  user: User;
+  accessToken: string;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -14,17 +22,42 @@ export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
   isAuthenticated: false,
 
-  setAuth: (user, accessToken) =>
+  setAuth: (user, accessToken) => {
+    const payload: PersistedAuth = { user, accessToken };
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(payload));
+
     set({
       user,
       accessToken,
       isAuthenticated: true,
-    }),
+    });
+  },
 
-  clearAuth: () =>
+  clearAuth: () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+
     set({
       user: null,
       accessToken: null,
       isAuthenticated: false,
-    }),
+    });
+  },
+
+  hydrateAuth: () => {
+    const storedAuth = localStorage.getItem(AUTH_STORAGE_KEY);
+
+    if (!storedAuth) return;
+
+    try {
+      const parsed: PersistedAuth = JSON.parse(storedAuth);
+
+      set({
+        user: parsed.user,
+        accessToken: parsed.accessToken,
+        isAuthenticated: true,
+      });
+    } catch {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+  },
 }));
