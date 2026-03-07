@@ -1,11 +1,5 @@
 import { create } from "zustand";
-
-type User = {
-  id: string;
-  username: string;
-  email: string;
-  profileImage?: string;
-};
+import type { User } from "../types/user";
 
 type AuthState = {
   user: User | null;
@@ -19,12 +13,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   accessToken: null,
   isAuthenticated: false,
+
   setAuth: (user, accessToken) =>
     set({
       user,
       accessToken,
       isAuthenticated: true,
     }),
+
   clearAuth: () =>
     set({
       user: null,

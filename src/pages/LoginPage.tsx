@@ -1,11 +1,24 @@
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { Box, Heading, Text, VStack } from "@chakra-ui/react";
 
 export function LoginPage() {
   return (
-    <Box>
-      <Heading mb={4}>Login</Heading>
+    <VStack align="start" gap={4}>
+      <Heading>Login</Heading>
 
       <Text color="gray.600">כאן יבוא טופס התחברות.</Text>
-    </Box>
+
+      <Box
+        w="full"
+        maxW="md"
+        p={6}
+        bg="white"
+        borderRadius="xl"
+        boxShadow="sm"
+        border="1px solid"
+        borderColor="gray.200"
+      >
+        <Text>טופס התחברות ייכנס כאן בשלב הבא.</Text>
+      </Box>
+    </VStack>
   );
 }
