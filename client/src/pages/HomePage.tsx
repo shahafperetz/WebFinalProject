@@ -1,25 +1,16 @@
-import { Box, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import { PageHeader } from "../components/common/PageHeader";
+import { PostsFeed } from "../features/posts/components/PostsFeed";
 
 export function HomePage() {
   return (
-    <VStack align="start" gap={4}>
-      <Heading>Home Feed</Heading>
+    <Box>
+      <PageHeader
+        title="Home Feed"
+        subtitle="Browse posts shared by users in the application"
+      />
 
-      <Text color="gray.600">
-        כאן יוצגו הפוסטים של המשתמשים עם גלילה מדורגת.
-      </Text>
-
-      <Box
-        w="full"
-        p={6}
-        bg="white"
-        borderRadius="xl"
-        boxShadow="sm"
-        border="1px solid"
-        borderColor="gray.200"
-      >
-        <Text>שלב הבא: ליצור Post Card ו-Feed אמיתי.</Text>
-      </Box>
-    </VStack>
+      <PostsFeed />
+    </Box>
   );
 }
