@@ -27,7 +27,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/uploads", express.static("uploads"));
 
-
 // Swagger
 const apisPath = path.join(__dirname, "routes", "*.*");
 const options = {
@@ -38,7 +37,7 @@ const options = {
       version: "1.0.0",
       description: "API for the Web Application Course final project",
     },
-    servers: [{ url: "http://localhost:3000" }],
+    servers: [{ url: "http://localhost:3001" }],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -63,7 +62,8 @@ app.use("/users", userRoutes);
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 // DB
-const mongoUrl = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/WEBFINALPROJECT";
+const mongoUrl =
+  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/WEBFINALPROJECT";
 mongoose
   .connect(mongoUrl)
   .then(() => console.log("Connected to MongoDB"))

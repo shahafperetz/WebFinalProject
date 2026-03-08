@@ -14,7 +14,7 @@ export function LoginForm() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -38,14 +38,14 @@ export function LoginForm() {
           </Alert.Root>
         ) : null}
 
-        <Field.Root invalid={!!errors.email}>
-          <Field.Label>Email</Field.Label>
+        <Field.Root invalid={!!errors.username}>
+          <Field.Label>Username</Field.Label>
           <Input
-            type="email"
-            placeholder="Enter your email"
-            {...register("email")}
+            type="text"
+            placeholder="Enter your username"
+            {...register("username")}
           />
-          <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
+          <Field.ErrorText>{errors.username?.message}</Field.ErrorText>
         </Field.Root>
 
         <Field.Root invalid={!!errors.password}>

@@ -1,62 +1,24 @@
-import type { AuthResponse, LoginDto, RegisterDto } from "../types/auth";
+import { apiClient } from "./client";
 
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export async function register(data: {
+  username: string;
+  email: string;
+  password: string;
+}) {
+  const res = await apiClient.post("/auth/register", data);
+  return res.data;
 }
 
-export async function login(data: LoginDto): Promise<AuthResponse> {
-  await wait(700);
-
-  return {
-    user: {
-      id: "1",
-      username: "tal",
-      email: data.email,
-      profileImage: "",
-    },
-    accessToken: "mock-access-token",
-  };
+export async function login(data: { username: string; password: string }) {
+  const res = await apiClient.post("/auth/login", data);
+  return res.data;
 }
 
-export async function register(data: RegisterDto): Promise<AuthResponse> {
-  await wait(700);
-
-  return {
-    user: {
-      id: "1",
-      username: data.username,
-      email: data.email,
-      profileImage: "",
-    },
-    accessToken: "mock-access-token",
-  };
+export async function refreshToken() {
+  const res = await apiClient.post("/auth/refresh");
+  return res.data;
 }
 
-export async function logout(): Promise<void> {
-  await wait(300);
-}
-
-export async function refreshToken(): Promise<AuthResponse> {
-  await wait(300);
-
-  return {
-    user: {
-      id: "1",
-      username: "tal",
-      email: "tal@example.com",
-      profileImage: "",
-    },
-    accessToken: "mock-access-token",
-  };
-}
-
-export async function getMe(): Promise<AuthResponse["user"]> {
-  await wait(300);
-
-  return {
-    id: "1",
-    username: "tal",
-    email: "tal@example.com",
-    profileImage: "",
-  };
+export async function logout() {
+  await apiClient.post("/auth/logout");
 }
