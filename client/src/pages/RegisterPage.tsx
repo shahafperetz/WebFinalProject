@@ -2,7 +2,7 @@ import { Box, Text } from "@chakra-ui/react";
 import { PageHeader } from "../components/common/PageHeader";
 import { RegisterForm } from "../features/auth/components/RegisterForm";
 
-export function RegisterPage() {
+export const RegisterPage = () => {
   return (
     <Box maxW="md">
       <PageHeader
@@ -27,4 +27,4 @@ export function RegisterPage() {
       </Text>
     </Box>
   );
-}
+};

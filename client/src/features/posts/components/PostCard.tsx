@@ -10,11 +10,11 @@ import {
 } from "@chakra-ui/react";
 import type { Post } from "../../../types/post";
 
-type Props = {
+type PostCardProps = {
   post: Post;
 };
 
-export function PostCard({ post }: Props) {
+export const PostCard = ({ post }: PostCardProps) => {
   return (
     <Card.Root overflow="hidden" borderRadius="2xl">
       <Card.Body gap={4}>
@@ -26,6 +26,7 @@ export function PostCard({ post }: Props) {
 
             <VStack align="start" gap={0}>
               <Text fontWeight="bold">{post.username}</Text>
+
               <Text fontSize="sm" color="gray.500">
                 {new Date(post.createdAt).toLocaleString()}
               </Text>
@@ -37,6 +38,7 @@ export function PostCard({ post }: Props) {
               <Button size="sm" variant="ghost">
                 Edit
               </Button>
+
               <Button size="sm" variant="ghost" colorPalette="red">
                 Delete
               </Button>
@@ -74,4 +76,4 @@ export function PostCard({ post }: Props) {
       </Card.Body>
     </Card.Root>
   );
-}
+};

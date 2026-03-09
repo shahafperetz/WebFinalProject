@@ -1,11 +1,11 @@
 import { apiClient } from "./client";
 
-export async function getMyInfo() {
+export const getMyInfo = async () => {
   const res = await apiClient.get("/users/myInfo");
   return res.data;
-}
+};
 
-export async function getUserById(id: string) {
+export const getUserById = async (id: string) => {
   const res = await apiClient.get(`/users/${id}`);
   return res.data;
-}
+};

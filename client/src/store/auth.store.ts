@@ -5,6 +5,7 @@ type AuthState = {
   user: User | null;
   accessToken: string | null;
   isAuthenticated: boolean;
+  isHydrated: boolean;
   setAuth: (user: User, accessToken: string) => void;
   clearAuth: () => void;
   hydrateAuth: () => void;
@@ -21,6 +22,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   accessToken: null,
   isAuthenticated: false,
+  isHydrated: false,
 
   setAuth: (user, accessToken) => {
     const payload: PersistedAuth = { user, accessToken };
@@ -46,7 +48,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   hydrateAuth: () => {
     const storedAuth = localStorage.getItem(AUTH_STORAGE_KEY);
 
-    if (!storedAuth) return;
+    if (!storedAuth) {
+      set({ isHydrated: true });
+      return;
+    }
 
     try {
       const parsed: PersistedAuth = JSON.parse(storedAuth);
@@ -55,9 +60,16 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: parsed.user,
         accessToken: parsed.accessToken,
         isAuthenticated: true,
+        isHydrated: true,
       });
     } catch {
       localStorage.removeItem(AUTH_STORAGE_KEY);
+      set({
+        user: null,
+        accessToken: null,
+        isAuthenticated: false,
+        isHydrated: true,
+      });
     }
   },
 }));

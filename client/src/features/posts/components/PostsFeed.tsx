@@ -1,8 +1,8 @@
-import { VStack } from '@chakra-ui/react';
-import { mockPosts } from '../mockPosts';
-import { PostCard } from './PostCard';
+import { VStack } from "@chakra-ui/react";
+import { mockPosts } from "../mockPosts";
+import { PostCard } from "./PostCard";
 
-export function PostsFeed() {
+export const PostsFeed = () => {
   return (
     <VStack gap={6} align="stretch">
       {mockPosts.map((post) => (
@@ -10,4 +10,4 @@ export function PostsFeed() {
       ))}
     </VStack>
   );
-}
+};

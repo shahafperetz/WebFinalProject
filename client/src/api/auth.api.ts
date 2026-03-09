@@ -9,16 +9,16 @@ export async function register(data: {
   return res.data;
 }
 
-export async function login(data: { username: string; password: string }) {
+export const login = async (data: { username: string; password: string }) => {
   const res = await apiClient.post("/auth/login", data);
   return res.data;
-}
+};
 
-export async function refreshToken() {
+export const refreshToken = async () => {
   const res = await apiClient.post("/auth/refresh");
   return res.data;
-}
+};
 
-export async function logout() {
+export const logout = async () => {
   await apiClient.post("/auth/logout");
-}
+};

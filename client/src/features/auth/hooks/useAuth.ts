@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { login, logout, register } from "../../../api/auth.api";
 import { useAuthStore } from "../../../store/auth.store";
 
-export function useAuth() {
+export const useAuth = () => {
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
   const clearAuth = useAuthStore((state) => state.clearAuth);
@@ -37,4 +37,4 @@ export function useAuth() {
     registerMutation,
     logoutMutation,
   };
-}
+};

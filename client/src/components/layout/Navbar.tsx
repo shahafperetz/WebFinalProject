@@ -7,11 +7,31 @@ import {
   Spacer,
   Text,
 } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useAuthStore } from "../../store/auth.store";
 import { useAuth } from "../../features/auth/hooks/useAuth";
 
-export function Navbar() {
+type NavButtonProps = {
+  to: string;
+  children: React.ReactNode;
+};
+
+const NavButton = ({ to, children }: NavButtonProps) => {
+  return (
+    <NavLink to={to}>
+      {({ isActive }) => (
+        <Button
+          variant={isActive ? "solid" : "ghost"}
+          colorPalette={isActive ? "blue" : undefined}
+        >
+          {children}
+        </Button>
+      )}
+    </NavLink>
+  );
+};
+
+export const Navbar = () => {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { logoutMutation } = useAuth();
@@ -30,21 +50,12 @@ export function Navbar() {
         <Spacer />
 
         <HStack gap={3}>
-          <Button asChild variant="ghost">
-            <RouterLink to="/">Home</RouterLink>
-          </Button>
+          <NavButton to="/">Home</NavButton>
 
           {isAuthenticated ? (
             <>
-              <Button asChild variant="ghost">
-                <RouterLink to={`/profile/${user?.id ?? ""}`}>
-                  Profile
-                </RouterLink>
-              </Button>
-
-              <Button asChild variant="ghost">
-                <RouterLink to="/my-posts">My Posts</RouterLink>
-              </Button>
+              <NavButton to={`/profile/${user?.id ?? ""}`}>Profile</NavButton>
+              <NavButton to="/my-posts">My Posts</NavButton>
 
               <Text color="gray.600">{user?.username}</Text>
 
@@ -58,17 +69,12 @@ export function Navbar() {
             </>
           ) : (
             <>
-              <Button asChild variant="ghost">
-                <RouterLink to="/login">Login</RouterLink>
-              </Button>
-
-              <Button asChild colorPalette="blue">
-                <RouterLink to="/register">Register</RouterLink>
-              </Button>
+              <NavButton to="/login">Login</NavButton>
+              <NavButton to="/register">Register</NavButton>
             </>
           )}
         </HStack>
       </Flex>
     </Box>
   );
-}
+};

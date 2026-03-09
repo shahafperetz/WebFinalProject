@@ -2,7 +2,7 @@ import { Box } from "@chakra-ui/react";
 import { PageHeader } from "../components/common/PageHeader";
 import { PostsFeed } from "../features/posts/components/PostsFeed";
 
-export function MyPostsPage() {
+export const MyPostsPage = () => {
   return (
     <Box>
       <PageHeader
@@ -13,4 +13,4 @@ export function MyPostsPage() {
       <PostsFeed />
     </Box>
   );
-}
+};

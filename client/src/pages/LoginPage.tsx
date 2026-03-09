@@ -2,7 +2,7 @@ import { Box, Text } from "@chakra-ui/react";
 import { PageHeader } from "../components/common/PageHeader";
 import { LoginForm } from "../features/auth/components/LoginForm";
 
-export function LoginPage() {
+export const LoginPage = () => {
   return (
     <Box maxW="md">
       <PageHeader
@@ -27,4 +27,4 @@ export function LoginPage() {
       </Text>
     </Box>
   );
-}
+};

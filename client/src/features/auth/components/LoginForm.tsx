@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { loginSchema, type LoginFormValues } from "../schemas/login.schema";
 import { useAuth } from "../hooks/useAuth";
 
-export function LoginForm() {
+export const LoginForm = () => {
   const { loginMutation } = useAuth();
 
   const {

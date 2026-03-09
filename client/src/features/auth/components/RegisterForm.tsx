@@ -7,7 +7,7 @@ import {
 } from "../schemas/register.schema";
 import { useAuth } from "../hooks/useAuth";
 
-export function RegisterForm() {
+export const RegisterForm = () => {
   const { registerMutation } = useAuth();
 
   const {
@@ -91,4 +91,4 @@ export function RegisterForm() {
       </Stack>
     </form>
   );
-}
+};

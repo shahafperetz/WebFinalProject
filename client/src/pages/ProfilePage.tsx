@@ -1,7 +1,7 @@
 import { Avatar, Box, Heading, HStack, Text, VStack } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 
-export function ProfilePage() {
+export const ProfilePage = () => {
   const { id } = useParams();
 
   return (
@@ -32,4 +32,4 @@ export function ProfilePage() {
       </Box>
     </VStack>
   );
-}
+};
