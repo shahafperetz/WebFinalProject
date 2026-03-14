@@ -1,6 +1,6 @@
-import { VStack, Spinner, Center, Text } from "@chakra-ui/react";
+import { Center, Spinner, Text, VStack } from "@chakra-ui/react";
+import { usePosts } from "../hooks/use-posts";
 import { PostCard } from "./PostCard";
-import { usePosts } from "../hooks/usePosts";
 
 export const PostsFeed = () => {
   const { data, isLoading, isError } = usePosts();

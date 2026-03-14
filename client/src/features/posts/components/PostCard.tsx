@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useAuthStore } from "../../../store/auth.store";
 import type { Post } from "../types/post.types";
+import { useToggleLike } from "../hooks/use-toggle-like";
 
 type PostCardProps = {
   post: Post;
@@ -17,6 +18,8 @@ type PostCardProps = {
 
 export const PostCard = ({ post }: PostCardProps) => {
   const currentUser = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const toggleLikeMutation = useToggleLike();
 
   const isOwner =
     currentUser?._id === post.owner._id || currentUser?.id === post.owner._id;
@@ -25,6 +28,11 @@ export const PostCard = ({ post }: PostCardProps) => {
   const avatarUrl = post.owner.image
     ? `http://localhost:3001${post.owner.image}`
     : "";
+
+  const handleLikeClick = () => {
+    if (!isAuthenticated) return;
+    toggleLikeMutation.mutate(post._id);
+  };
 
   return (
     <Card.Root overflow="hidden" borderRadius="2xl">
@@ -77,6 +85,9 @@ export const PostCard = ({ post }: PostCardProps) => {
             size="sm"
             variant={post.likedByMe ? "solid" : "outline"}
             colorPalette="blue"
+            onClick={handleLikeClick}
+            loading={toggleLikeMutation.isPending}
+            disabled={!isAuthenticated}
           >
             {post.likedByMe ? "Liked" : "Like"} ({post.likesCount})
           </Button>
