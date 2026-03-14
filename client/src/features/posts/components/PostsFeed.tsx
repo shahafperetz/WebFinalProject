@@ -1,12 +1,30 @@
-import { VStack } from "@chakra-ui/react";
-import { mockPosts } from "../mockPosts";
+import { VStack, Spinner, Center, Text } from "@chakra-ui/react";
 import { PostCard } from "./PostCard";
+import { usePosts } from "../hooks/usePosts";
 
 export const PostsFeed = () => {
+  const { data, isLoading, isError } = usePosts();
+
+  if (isLoading) {
+    return (
+      <Center py={10}>
+        <Spinner size="lg" />
+      </Center>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Center py={10}>
+        <Text>Failed to load posts</Text>
+      </Center>
+    );
+  }
+
   return (
     <VStack gap={6} align="stretch">
-      {mockPosts.map((post) => (
-        <PostCard key={post.id} post={post} />
+      {data?.items.map((post) => (
+        <PostCard key={post._id} post={post} />
       ))}
     </VStack>
   );

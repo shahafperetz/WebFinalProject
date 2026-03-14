@@ -8,24 +8,36 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import type { Post } from "../../../types/post";
+import { useAuthStore } from "../../../store/auth.store";
+import type { Post } from "../types/post.types";
 
 type PostCardProps = {
   post: Post;
 };
 
 export const PostCard = ({ post }: PostCardProps) => {
+  const currentUser = useAuthStore((state) => state.user);
+
+  const isOwner =
+    currentUser?._id === post.owner._id || currentUser?.id === post.owner._id;
+
+  const postImageUrl = post.image ? `http://localhost:3001${post.image}` : "";
+  const avatarUrl = post.owner.image
+    ? `http://localhost:3001${post.owner.image}`
+    : "";
+
   return (
     <Card.Root overflow="hidden" borderRadius="2xl">
       <Card.Body gap={4}>
         <HStack justify="space-between" align="start">
           <HStack gap={3}>
             <Avatar.Root>
-              <Avatar.Fallback name={post.username} />
+              {avatarUrl ? <Avatar.Image src={avatarUrl} /> : null}
+              <Avatar.Fallback name={post.owner.username} />
             </Avatar.Root>
 
             <VStack align="start" gap={0}>
-              <Text fontWeight="bold">{post.username}</Text>
+              <Text fontWeight="bold">{post.owner.username}</Text>
 
               <Text fontSize="sm" color="gray.500">
                 {new Date(post.createdAt).toLocaleString()}
@@ -33,7 +45,7 @@ export const PostCard = ({ post }: PostCardProps) => {
             </VStack>
           </HStack>
 
-          {post.isOwner ? (
+          {isOwner ? (
             <HStack>
               <Button size="sm" variant="ghost">
                 Edit
@@ -46,12 +58,12 @@ export const PostCard = ({ post }: PostCardProps) => {
           ) : null}
         </HStack>
 
-        <Text>{post.content}</Text>
+        <Text>{post.text}</Text>
 
-        {post.imageUrl ? (
+        {postImageUrl ? (
           <Box overflow="hidden" borderRadius="xl">
             <Image
-              src={post.imageUrl}
+              src={postImageUrl}
               alt="Post image"
               w="full"
               maxH="420px"
@@ -63,10 +75,10 @@ export const PostCard = ({ post }: PostCardProps) => {
         <HStack gap={3}>
           <Button
             size="sm"
-            variant={post.isLiked ? "solid" : "outline"}
+            variant={post.likedByMe ? "solid" : "outline"}
             colorPalette="blue"
           >
-            {post.isLiked ? "Liked" : "Like"} ({post.likesCount})
+            {post.likedByMe ? "Liked" : "Like"} ({post.likesCount})
           </Button>
 
           <Button size="sm" variant="outline">
