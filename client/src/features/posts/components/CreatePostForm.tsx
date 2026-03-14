@@ -17,10 +17,12 @@ import {
   createPostSchema,
   type CreatePostFormValues,
 } from "../schemas/create-post.schema.ts";
+import { useNavigate } from "react-router-dom";
 
 export const CreatePostForm = () => {
   const queryClient = useQueryClient();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const navigate = useNavigate();
 
   const previewUrl = useMemo(() => {
     if (!selectedImage) return "";
@@ -45,6 +47,8 @@ export const CreatePostForm = () => {
       reset();
       setSelectedImage(null);
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
+
+      navigate("/");
     },
   });
 

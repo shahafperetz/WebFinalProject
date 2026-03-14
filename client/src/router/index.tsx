@@ -7,6 +7,7 @@ import { ProfilePage } from "../pages/ProfilePage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { MyPostsPage } from "../pages/MyPostsPage";
+import { CreatePostPage } from "../pages/CreatePostPage";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "profile/:id", element: <ProfilePage /> },
           { path: "my-posts", element: <MyPostsPage /> },
+          { path: "create-post", element: <CreatePostPage /> },
         ],
       },
     ],

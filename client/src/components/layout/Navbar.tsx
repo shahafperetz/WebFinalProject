@@ -14,24 +14,25 @@ import { useAuth } from "../../features/auth/hooks/useAuth";
 type NavButtonProps = {
   to: string;
   children: React.ReactNode;
+  colorPalette?: string;
 };
 
-const NavButton = ({ to, children }: NavButtonProps) => {
+function NavButton({ to, children, colorPalette }: NavButtonProps) {
   return (
     <NavLink to={to}>
       {({ isActive }) => (
         <Button
           variant={isActive ? "solid" : "ghost"}
-          colorPalette={isActive ? "blue" : undefined}
+          colorPalette={isActive ? colorPalette ?? "blue" : undefined}
         >
           {children}
         </Button>
       )}
     </NavLink>
   );
-};
+}
 
-export const Navbar = () => {
+export function Navbar() {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { logoutMutation } = useAuth();
@@ -43,6 +44,9 @@ export const Navbar = () => {
       borderColor="gray.200"
       px={6}
       py={4}
+      position="sticky"
+      top={0}
+      zIndex={10}
     >
       <Flex align="center" maxW="6xl" mx="auto">
         <Heading size="md">Social AI App</Heading>
@@ -54,10 +58,19 @@ export const Navbar = () => {
 
           {isAuthenticated ? (
             <>
-              <NavButton to={`/profile/${user?.id ?? ""}`}>Profile</NavButton>
+              <NavButton to="/create-post" colorPalette="blue">
+                Create Post
+              </NavButton>
+
+              <NavButton to={`/profile/${user?._id ?? user?.id ?? ""}`}>
+                Profile
+              </NavButton>
+
               <NavButton to="/my-posts">My Posts</NavButton>
 
-              <Text color="gray.600">{user?.username}</Text>
+              <Text color="gray.600" fontWeight="medium">
+                {user?.username}
+              </Text>
 
               <Button
                 variant="outline"
@@ -70,11 +83,13 @@ export const Navbar = () => {
           ) : (
             <>
               <NavButton to="/login">Login</NavButton>
-              <NavButton to="/register">Register</NavButton>
+              <NavButton to="/register" colorPalette="blue">
+                Register
+              </NavButton>
             </>
           )}
         </HStack>
       </Flex>
     </Box>
   );
-};
+}
