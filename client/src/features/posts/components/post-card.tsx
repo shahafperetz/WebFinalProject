@@ -178,7 +178,7 @@ export const PostCard = ({ post }: PostCardProps) => {
           </Button>
 
           <Button asChild size="sm" variant="outline">
-            <RouterLink to={`/posts/${post._id}`}>
+            <RouterLink to={`/posts/${post._id}/comments`}>
               Comments ({post.commentsCount})
             </RouterLink>
           </Button>

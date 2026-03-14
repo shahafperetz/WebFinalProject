@@ -8,6 +8,7 @@ import { NotFoundPage } from "../pages/not-found-page";
 import { ProtectedRoute } from "./protected-route";
 import { MyPostsPage } from "../pages/my-posts-page";
 import { CreatePostPage } from "../pages/create-post-page";
+import { PostCommentsPage } from "../pages/post-comments-page";
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
           { path: "profile/:id", element: <ProfilePage /> },
           { path: "my-posts", element: <MyPostsPage /> },
           { path: "create-post", element: <CreatePostPage /> },
+          {
+            path: "/posts/:postId/comments",
+            element: <PostCommentsPage />,
+          },
         ],
       },
     ],
