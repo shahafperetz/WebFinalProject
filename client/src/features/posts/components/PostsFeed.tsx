@@ -21,9 +21,17 @@ export const PostsFeed = () => {
     );
   }
 
+  if (!data?.items.length) {
+    return (
+      <Center py={10}>
+        <Text color="gray.500">No posts yet</Text>
+      </Center>
+    );
+  }
+
   return (
     <VStack gap={6} align="stretch">
-      {data?.items.map((post) => (
+      {data.items.map((post) => (
         <PostCard key={post._id} post={post} />
       ))}
     </VStack>

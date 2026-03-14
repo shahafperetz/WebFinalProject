@@ -1,8 +1,11 @@
-import { Box } from "@chakra-ui/react";
+import { Box, VStack } from "@chakra-ui/react";
 import { PageHeader } from "../components/common/PageHeader";
+import { CreatePostForm } from "../features/posts/components/CreatePostForm";
 import { PostsFeed } from "../features/posts/components/PostsFeed";
+ 
 
-export const HomePage = () => {
+export function HomePage() {
+
   return (
     <Box>
       <PageHeader
@@ -10,7 +13,10 @@ export const HomePage = () => {
         subtitle="Browse posts shared by users in the application"
       />
 
-      <PostsFeed />
+      <VStack align="stretch" gap={6}>
+        <CreatePostForm />
+        <PostsFeed />
+      </VStack>
     </Box>
   );
-};
+}
