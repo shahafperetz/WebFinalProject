@@ -1,6 +1,6 @@
 import { Box, VStack } from "@chakra-ui/react";
-import { PageHeader } from "../components/common/PageHeader";
-import { PostsFeed } from "../features/posts/components/PostsFeed";
+import { PageHeader } from "../components/common/page-header";
+import { PostsFeed } from "../features/posts/components/posts-feed";
 
 export function HomePage() {
   return (

@@ -1,13 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
-import { AppLayout } from "../components/layout/AppLayout";
-import { HomePage } from "../pages/HomePage";
-import { LoginPage } from "../pages/LoginPage";
-import { RegisterPage } from "../pages/RegisterPage";
-import { ProfilePage } from "../pages/ProfilePage";
-import { NotFoundPage } from "../pages/NotFoundPage";
-import { ProtectedRoute } from "./ProtectedRoute";
-import { MyPostsPage } from "../pages/MyPostsPage";
-import { CreatePostPage } from "../pages/CreatePostPage";
+import { AppLayout } from "../components/layout/app-layout";
+import { HomePage } from "../pages/home-page";
+import { LoginPage } from "../pages/login-page";
+import { RegisterPage } from "../pages/register-page";
+import { ProfilePage } from "../pages/profile-page";
+import { NotFoundPage } from "../pages/not-found-page";
+import { ProtectedRoute } from "./protected-route";
+import { MyPostsPage } from "../pages/my-posts-page";
+import { CreatePostPage } from "../pages/create-post-page";
 
 export const router = createBrowserRouter([
   {

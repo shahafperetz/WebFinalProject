@@ -1,6 +1,6 @@
 import { Box, Center, Spinner, Text, VStack } from "@chakra-ui/react";
-import { PageHeader } from "../components/common/PageHeader";
-import { PostCard } from "../features/posts/components/PostCard";
+import { PageHeader } from "../components/common/page-header";
+import { PostCard } from "../features/posts/components/post-card";
 import { useMyPosts } from "../features/posts/hooks/use-my-posts";
 
 export function MyPostsPage() {
