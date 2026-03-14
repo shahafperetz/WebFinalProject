@@ -1,12 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
-import { AppLayout } from "../components/layout/AppLayout";
-import { HomePage } from "../pages/HomePage";
-import { LoginPage } from "../pages/LoginPage";
-import { RegisterPage } from "../pages/RegisterPage";
-import { ProfilePage } from "../pages/ProfilePage";
-import { NotFoundPage } from "../pages/NotFoundPage";
-import { ProtectedRoute } from "./ProtectedRoute";
-import { MyPostsPage } from "../pages/MyPostsPage";
+import { AppLayout } from "../components/layout/app-layout";
+import { HomePage } from "../pages/home-page";
+import { LoginPage } from "../pages/login-page";
+import { RegisterPage } from "../pages/register-page";
+import { ProfilePage } from "../pages/profile-page";
+import { NotFoundPage } from "../pages/not-found-page";
+import { ProtectedRoute } from "./protected-route";
+import { MyPostsPage } from "../pages/my-posts-page";
+import { CreatePostPage } from "../pages/create-post-page";
+import { PostCommentsPage } from "../pages/post-comments-page";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +24,11 @@ export const router = createBrowserRouter([
         children: [
           { path: "profile/:id", element: <ProfilePage /> },
           { path: "my-posts", element: <MyPostsPage /> },
+          { path: "create-post", element: <CreatePostPage /> },
+          {
+            path: "/posts/:postId/comments",
+            element: <PostCommentsPage />,
+          },
         ],
       },
     ],

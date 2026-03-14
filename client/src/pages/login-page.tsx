@@ -1,5 +1,5 @@
 import { Box, Text } from "@chakra-ui/react";
-import { PageHeader } from "../components/common/PageHeader";
+import { PageHeader } from "../components/common/page-header";
 import { LoginForm } from "../features/auth/components/LoginForm";
 
 export const LoginPage = () => {
