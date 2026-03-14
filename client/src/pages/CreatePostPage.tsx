@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { PageHeader } from "../components/common/PageHeader";
-import { CreatePostForm } from "../features/posts/components/CreatePostForm";
+import { CreatePostForm } from "../features/posts/components/create-post-form";
 
 export function CreatePostPage() {
   return (

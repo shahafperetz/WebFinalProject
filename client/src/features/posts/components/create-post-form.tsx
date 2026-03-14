@@ -12,7 +12,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createPost } from "../api/posts.api";
+import { createPost } from "../api/posts.api.ts";
 import {
   createPostSchema,
   type CreatePostFormValues,
