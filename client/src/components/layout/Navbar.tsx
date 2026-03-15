@@ -1,15 +1,17 @@
 import {
+  Avatar,
   Box,
   Button,
   Flex,
   HStack,
   Heading,
+  Menu,
+  Portal,
   Spacer,
-  Text,
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { useAuthStore } from "../../store/auth.store";
-import { useAuth } from "../../features/auth/hooks/useAuth";
+import { useAuth } from "../../features/auth/hooks/use-auth";
 
 type NavButtonProps = {
   to: string;
@@ -37,6 +39,8 @@ export function Navbar() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { logoutMutation } = useAuth();
 
+  const avatarUrl = user?.image ? `http://localhost:3001${user.image}` : "";
+
   return (
     <Box
       bg="white"
@@ -56,29 +60,45 @@ export function Navbar() {
         <HStack gap={3}>
           <NavButton to="/">Home</NavButton>
 
-          {isAuthenticated ? (
+          {isAuthenticated && user ? (
             <>
               <NavButton to="/create-post" colorPalette="blue">
                 Create Post
               </NavButton>
 
-              <NavButton to={`/profile/${user?._id ?? user?.id ?? ""}`}>
-                Profile
-              </NavButton>
+              <Menu.Root>
+                <Menu.Trigger asChild>
+                  <Button variant="ghost" p={1} borderRadius="full">
+                    <Avatar.Root size="sm">
+                      {avatarUrl ? <Avatar.Image src={avatarUrl} /> : null}
+                      <Avatar.Fallback name={user.username} />
+                    </Avatar.Root>
+                  </Button>
+                </Menu.Trigger>
 
-              <NavButton to="/my-posts">My Posts</NavButton>
+                <Portal>
+                  <Menu.Positioner>
+                    <Menu.Content minW="180px">
+                      <Menu.Item value="profile" asChild>
+                        <NavLink to={`/profile/${user._id ?? user.id}`}>
+                          Profile
+                        </NavLink>
+                      </Menu.Item>
 
-              <Text color="gray.600" fontWeight="medium">
-                {user?.username}
-              </Text>
+                      <Menu.Item value="my-posts" asChild>
+                        <NavLink to="/my-posts">My Posts</NavLink>
+                      </Menu.Item>
 
-              <Button
-                variant="outline"
-                onClick={() => logoutMutation.mutate()}
-                loading={logoutMutation.isPending}
-              >
-                Logout
-              </Button>
+                      <Menu.Item
+                        value="logout"
+                        onClick={() => logoutMutation.mutate()}
+                      >
+                        Logout
+                      </Menu.Item>
+                    </Menu.Content>
+                  </Menu.Positioner>
+                </Portal>
+              </Menu.Root>
             </>
           ) : (
             <>
