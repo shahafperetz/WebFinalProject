@@ -1,15 +1,20 @@
 import { Box, Container } from "@chakra-ui/react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Navbar } from "./navbar";
 
-export const AppLayout = () => {
+export function AppLayout() {
+  const location = useLocation();
+
+  const hideNavbar =
+    location.pathname === "/login" || location.pathname === "/register";
+
   return (
     <Box minH="100vh" bg="gray.50">
-      <Navbar />
+      {!hideNavbar ? <Navbar /> : null}
 
-      <Container maxW="6xl" py={8}>
+      <Container maxW="6xl" py={hideNavbar ? 0 : 8}>
         <Outlet />
       </Container>
     </Box>
   );
-};
+}

@@ -18,9 +18,8 @@ export const useAuth = () => {
 
   const registerMutation = useMutation({
     mutationFn: register,
-    onSuccess: (data) => {
-      setAuth(data.user, data.accessToken);
-      navigate("/");
+    onSuccess: () => {
+      navigate("/login");
     },
   });
 

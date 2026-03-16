@@ -1,13 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Button, Field, Input, Stack } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
+import { useAuth } from "../hooks/use-auth";
 import {
   registerSchema,
   type RegisterFormValues,
 } from "../schemas/register.schema";
-import { useAuth } from "../hooks/useAuth";
 
-export const RegisterForm = () => {
+export function RegisterForm() {
   const { registerMutation } = useAuth();
 
   const {
@@ -30,30 +30,37 @@ export const RegisterForm = () => {
     registerMutation.mutate(payload);
   };
 
+  const errorMessage =
+    (registerMutation.error as any)?.response?.data?.message ||
+    "Registration failed";
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4}>
         {registerMutation.isError ? (
-          <Alert.Root status="error">
+          <Alert.Root status="error" borderRadius="xl">
             <Alert.Indicator />
             <Alert.Content>
               <Alert.Title>Registration failed</Alert.Title>
-              <Alert.Description>
-                Please check your details and try again.
-              </Alert.Description>
+              <Alert.Description>{errorMessage}</Alert.Description>
             </Alert.Content>
           </Alert.Root>
         ) : null}
 
         <Field.Root invalid={!!errors.username}>
           <Field.Label>Username</Field.Label>
-          <Input placeholder="Enter your username" {...register("username")} />
+          <Input
+            size="lg"
+            placeholder="Choose a username"
+            {...register("username")}
+          />
           <Field.ErrorText>{errors.username?.message}</Field.ErrorText>
         </Field.Root>
 
         <Field.Root invalid={!!errors.email}>
           <Field.Label>Email</Field.Label>
           <Input
+            size="lg"
             type="email"
             placeholder="Enter your email"
             {...register("email")}
@@ -64,6 +71,7 @@ export const RegisterForm = () => {
         <Field.Root invalid={!!errors.password}>
           <Field.Label>Password</Field.Label>
           <Input
+            size="lg"
             type="password"
             placeholder="Create a password"
             {...register("password")}
@@ -74,8 +82,9 @@ export const RegisterForm = () => {
         <Field.Root invalid={!!errors.confirmPassword}>
           <Field.Label>Confirm Password</Field.Label>
           <Input
+            size="lg"
             type="password"
-            placeholder="Confirm your password"
+            placeholder="Repeat your password"
             {...register("confirmPassword")}
           />
           <Field.ErrorText>{errors.confirmPassword?.message}</Field.ErrorText>
@@ -83,12 +92,13 @@ export const RegisterForm = () => {
 
         <Button
           type="submit"
+          size="lg"
           colorPalette="blue"
           loading={registerMutation.isPending}
         >
-          Register
+          Create Account
         </Button>
       </Stack>
     </form>
   );
-};
+}
