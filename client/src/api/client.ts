@@ -15,3 +15,17 @@ apiClient.interceptors.request.use((config) => {
 
   return config;
 });
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+
+    if (status === 401 || status === 403) {
+      useAuthStore.getState().clearAuth();
+      window.location.href = "/login";
+    }
+
+    return Promise.reject(error);
+  }
+);
