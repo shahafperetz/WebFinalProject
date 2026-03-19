@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from "react";
-import { Box, Center, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Box, Center, Text, VStack } from "@chakra-ui/react";
 import { usePosts } from "../hooks/use-posts";
 import { PostCard } from "./post-card";
+import { PostsFeedSkeleton } from "./post-feed-skeleton";
 
 export const PostsFeed = () => {
   const {
@@ -16,7 +17,8 @@ export const PostsFeed = () => {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const posts = useMemo(() => {
-    return data?.pages.flatMap((page) => page.items) ?? [];
+    const all = data?.pages.flatMap((page) => page.items) ?? [];
+    return all.filter((post) => post.owner?._id);
   }, [data]);
 
   useEffect(() => {
@@ -43,11 +45,7 @@ export const PostsFeed = () => {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (isLoading) {
-    return (
-      <Center py={10}>
-        <Spinner size="lg" />
-      </Center>
-    );
+    return <PostsFeedSkeleton count={3} />;
   }
 
   if (isError) {
@@ -75,9 +73,9 @@ export const PostsFeed = () => {
       <Box ref={loadMoreRef} h="20px" />
 
       {isFetchingNextPage ? (
-        <Center py={4}>
-          <Spinner />
-        </Center>
+        <VStack gap={6} align="stretch">
+          <PostsFeedSkeleton count={2} />
+        </VStack>
       ) : null}
 
       {!hasNextPage ? (
