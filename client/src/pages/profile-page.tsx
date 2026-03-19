@@ -9,7 +9,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PageHeader } from "../components/common/page-header";
 import { useAuthStore } from "../store/auth.store";
@@ -23,24 +23,57 @@ export function ProfilePage() {
   const { id = "" } = useParams();
   const currentUser = useAuthStore((state) => state.user);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const isMe = currentUser?._id === id || currentUser?.id === id;
 
   const { data: profile, isLoading, isError } = useProfile(id, isMe);
+
   const myPostsQuery = useMyPosts();
   const allPostsQuery = usePosts();
+
+  const activeQuery = isMe ? myPostsQuery : allPostsQuery;
 
   const userPosts = useMemo(() => {
     if (!profile) return [];
 
+    const allLoadedPosts =
+      activeQuery.data?.pages.flatMap((page) => page.items) ?? [];
+
     if (isMe) {
-      return myPostsQuery.data?.items ?? [];
+      return allLoadedPosts;
     }
 
-    return (allPostsQuery.data?.items ?? []).filter(
-      (post) => post.owner._id === profile._id
+    return allLoadedPosts.filter((post) => post.owner._id === profile._id);
+  }, [profile, isMe, activeQuery.data]);
+
+  useEffect(() => {
+    const node = loadMoreRef.current;
+    if (!node || !activeQuery.hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const firstEntry = entries[0];
+
+        if (firstEntry?.isIntersecting && !activeQuery.isFetchingNextPage) {
+          activeQuery.fetchNextPage();
+        }
+      },
+      {
+        rootMargin: "200px",
+      }
     );
-  }, [profile, isMe, myPostsQuery.data, allPostsQuery.data]);
+
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [
+    activeQuery.fetchNextPage,
+    activeQuery.hasNextPage,
+    activeQuery.isFetchingNextPage,
+  ]);
 
   if (isLoading) {
     return (
@@ -130,11 +163,31 @@ export function ProfilePage() {
             Posts
           </Text>
 
-          {userPosts.length ? (
+          {activeQuery.isLoading ? (
+            <Center py={10}>
+              <Spinner />
+            </Center>
+          ) : userPosts.length ? (
             <VStack align="stretch" gap={6}>
               {userPosts.map((post) => (
                 <PostCard key={post._id} post={post} />
               ))}
+
+              <Box ref={loadMoreRef} h="20px" />
+
+              {activeQuery.isFetchingNextPage ? (
+                <Center py={4}>
+                  <Spinner />
+                </Center>
+              ) : null}
+
+              {!activeQuery.hasNextPage ? (
+                <Center py={4}>
+                  <Text color="gray.500" fontSize="sm">
+                    No more posts to load
+                  </Text>
+                </Center>
+              ) : null}
             </VStack>
           ) : (
             <Text color="gray.500">No posts yet</Text>
