@@ -31,13 +31,15 @@ export const PostCard = ({ post }: PostCardProps) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
+  const ownerId = post.owner?._id;
+  const ownerUsername = post.owner?.username ?? "Unknown user";
+  const ownerImage = post.owner?.image ?? "";
+
   const isOwner =
-    currentUser?._id === post.owner._id || currentUser?.id === post.owner._id;
+    !!ownerId && (currentUser?._id === ownerId || currentUser?.id === ownerId);
 
   const postImageUrl = post.image ? `http://localhost:3001${post.image}` : "";
-  const avatarUrl = post.owner.image
-    ? `http://localhost:3001${post.owner.image}`
-    : "";
+  const avatarUrl = ownerImage ? `http://localhost:3001${ownerImage}` : "";
 
   const handleLikeClick = () => {
     if (!isAuthenticated) return;
@@ -59,11 +61,11 @@ export const PostCard = ({ post }: PostCardProps) => {
           <HStack gap={3}>
             <Avatar.Root>
               {avatarUrl ? <Avatar.Image src={avatarUrl} /> : null}
-              <Avatar.Fallback name={post.owner.username} />
+              <Avatar.Fallback name={ownerUsername} />
             </Avatar.Root>
 
             <VStack align="start" gap={0}>
-              <Text fontWeight="bold">{post.owner.username}</Text>
+              <Text fontWeight="bold">{ownerUsername}</Text>
 
               <Text fontSize="sm" color="gray.500">
                 {new Date(post.createdAt).toLocaleString()}
