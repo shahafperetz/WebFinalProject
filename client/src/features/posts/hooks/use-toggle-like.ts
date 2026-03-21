@@ -9,6 +9,7 @@ export const useToggleLike = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
       await queryClient.invalidateQueries({ queryKey: ["my-posts"] });
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
   });
 };

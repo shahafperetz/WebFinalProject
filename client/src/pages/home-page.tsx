@@ -1,18 +1,17 @@
-import { Box, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import { PageHeader } from "../components/common/page-header";
+import { AiPostSearch } from "../features/ai/components/ai-post-search";
 import { PostsFeed } from "../features/posts/components/posts-feed";
 
-export function HomePage() {
+export const HomePage = () => {
   return (
-    <Box>
+    <VStack align="stretch" gap={6}>
       <PageHeader
         title="Home Feed"
-        subtitle="Browse posts shared by users in the application"
+        subtitle="Browse posts and search them with AI"
       />
-
-      <VStack align="stretch" gap={6}>
-        <PostsFeed />
-      </VStack>
-    </Box>
+      <AiPostSearch />
+      <PostsFeed />
+    </VStack>
   );
-}
+};

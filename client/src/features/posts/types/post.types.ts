@@ -6,7 +6,7 @@ export type PostOwner = {
 
 export type Post = {
   _id: string;
-  owner: PostOwner;
+  owner?: PostOwner;
   text: string;
   image: string;
   commentsCount: number;
@@ -20,4 +20,10 @@ export type PaginatedPostsResponse = {
   skip: number;
   limit: number;
   items: Post[];
+};
+
+export type ToggleLikeResponse = {
+  postId: string;
+  likesCount: number;
+  likedByMe: boolean;
 };

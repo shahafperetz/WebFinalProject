@@ -3,8 +3,9 @@ import { Alert, Button, Field, Input, Stack } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../hooks/use-auth";
 import { loginSchema, type LoginFormValues } from "../schemas/login.schema";
+import { getErrorMessage } from "../../../utils/get-error-message";
 
-export function LoginForm() {
+export const LoginForm = () => {
   const { loginMutation } = useAuth();
 
   const {
@@ -23,9 +24,7 @@ export function LoginForm() {
     loginMutation.mutate(values);
   };
 
-  const errorMessage =
-    (loginMutation.error as any)?.response?.data?.message || "Login failed";
-
+  const errorMessage = getErrorMessage(loginMutation.error, "Login failed");
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4}>
@@ -71,4 +70,4 @@ export function LoginForm() {
       </Stack>
     </form>
   );
-}
+};

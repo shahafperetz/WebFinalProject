@@ -10,8 +10,9 @@ import {
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { LoginForm } from "../features/auth/components/login-form";
+import { GoogleLoginButton } from "../features/auth/components/google-login-button";
 
-export function LoginPage() {
+export const LoginPage = () => {
   return (
     <Box minH="calc(100vh - 80px)" bg="gray.50" py={{ base: 8, md: 16 }}>
       <Container maxW="7xl">
@@ -85,15 +86,13 @@ export function LoginPage() {
 
                 <LoginForm />
 
+                <GoogleLoginButton />
+
                 <Separator />
 
                 <Button asChild size="lg" variant="outline" colorPalette="blue">
                   <RouterLink to="/register">Create new account</RouterLink>
                 </Button>
-
-                <Text textAlign="center" color="gray.500" fontSize="sm">
-                  Google / Facebook login can be added here next.
-                </Text>
               </VStack>
             </Box>
           </Box>
@@ -101,7 +100,7 @@ export function LoginPage() {
       </Container>
     </Box>
   );
-}
+};
 
 type FeatureCardProps = {
   title: string;

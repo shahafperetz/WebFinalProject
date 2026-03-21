@@ -6,8 +6,9 @@ import {
   registerSchema,
   type RegisterFormValues,
 } from "../schemas/register.schema";
+import { getErrorMessage } from "../../../utils/get-error-message";
 
-export function RegisterForm() {
+export const RegisterForm = () => {
   const { registerMutation } = useAuth();
 
   const {
@@ -30,9 +31,10 @@ export function RegisterForm() {
     registerMutation.mutate(payload);
   };
 
-  const errorMessage =
-    (registerMutation.error as any)?.response?.data?.message ||
-    "Registration failed";
+  const errorMessage = getErrorMessage(
+    registerMutation.error,
+    "Registration failed"
+  );
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -101,4 +103,4 @@ export function RegisterForm() {
       </Stack>
     </form>
   );
-}
+};
