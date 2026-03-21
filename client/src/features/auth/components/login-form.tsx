@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../hooks/use-auth";
 import { loginSchema, type LoginFormValues } from "../schemas/login.schema";
 
-export function LoginForm() {
+export const LoginForm = () => {
   const { loginMutation } = useAuth();
 
   const {
@@ -71,4 +71,4 @@ export function LoginForm() {
       </Stack>
     </form>
   );
-}
+};

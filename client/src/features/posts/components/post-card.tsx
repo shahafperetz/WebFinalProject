@@ -53,6 +53,12 @@ export const PostCard = ({ post }: PostCardProps) => {
       },
     });
   };
+  console.log(
+    "post likedByMe",
+    post._id,
+    post.likedByMe,
+    typeof post.likedByMe
+  );
 
   return (
     <Card.Root overflow="hidden" borderRadius="2xl">

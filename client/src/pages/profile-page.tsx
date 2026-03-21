@@ -19,7 +19,7 @@ import { useMyPosts } from "../features/posts/hooks/use-my-posts";
 import { usePosts } from "../features/posts/hooks/use-posts";
 import { PostCard } from "../features/posts/components/post-card";
 
-export function ProfilePage() {
+export const ProfilePage = () => {
   const { id = "" } = useParams();
   const currentUser = useAuthStore((state) => state.user);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -196,4 +196,4 @@ export function ProfilePage() {
       </VStack>
     </Box>
   );
-}
+};

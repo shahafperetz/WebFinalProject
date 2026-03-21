@@ -4,7 +4,7 @@ import { PageHeader } from "../components/common/page-header";
 import { PostCard } from "../features/posts/components/post-card";
 import { useMyPosts } from "../features/posts/hooks/use-my-posts";
 
-export function MyPostsPage() {
+export const MyPostsPage = () => {
   const {
     data,
     isLoading,
@@ -87,4 +87,4 @@ export function MyPostsPage() {
       )}
     </Box>
   );
-}
+};

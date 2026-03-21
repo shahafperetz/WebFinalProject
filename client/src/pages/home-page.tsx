@@ -2,7 +2,7 @@ import { Box, VStack } from "@chakra-ui/react";
 import { PageHeader } from "../components/common/page-header";
 import { PostsFeed } from "../features/posts/components/posts-feed";
 
-export function HomePage() {
+export const HomePage = () => {
   return (
     <Box>
       <PageHeader
@@ -15,4 +15,4 @@ export function HomePage() {
       </VStack>
     </Box>
   );
-}
+};

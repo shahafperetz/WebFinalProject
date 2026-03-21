@@ -11,7 +11,7 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import { LoginForm } from "../features/auth/components/login-form";
 
-export function LoginPage() {
+export const LoginPage = () => {
   return (
     <Box minH="calc(100vh - 80px)" bg="gray.50" py={{ base: 8, md: 16 }}>
       <Container maxW="7xl">
@@ -101,7 +101,7 @@ export function LoginPage() {
       </Container>
     </Box>
   );
-}
+};
 
 type FeatureCardProps = {
   title: string;

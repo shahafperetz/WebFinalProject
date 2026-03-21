@@ -4,7 +4,7 @@ import { CommentForm } from "../features/comments/components/comment-form";
 import { CommentsList } from "../features/comments/components/comments-list";
 import { useComments } from "../features/comments/hooks/use-comments";
 
-export function PostCommentsPage() {
+export const PostCommentsPage = () => {
   const { postId = "" } = useParams();
 
   const { data, isLoading } = useComments(postId);
@@ -26,4 +26,4 @@ export function PostCommentsPage() {
       </VStack>
     </Box>
   );
-}
+};
