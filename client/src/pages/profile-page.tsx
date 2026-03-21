@@ -44,7 +44,7 @@ export const ProfilePage = () => {
       return allLoadedPosts;
     }
 
-    return allLoadedPosts.filter((post) => post.owner._id === profile._id);
+    return allLoadedPosts.filter((post) => post?.owner?._id === profile._id);
   }, [profile, isMe, activeQuery.data]);
 
   useEffect(() => {
