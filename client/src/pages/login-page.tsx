@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { LoginForm } from "../features/auth/components/login-form";
+import { GoogleLoginButton } from "../features/auth/components/google-login-button";
 
 export const LoginPage = () => {
   return (
@@ -85,15 +86,13 @@ export const LoginPage = () => {
 
                 <LoginForm />
 
+                <GoogleLoginButton />
+
                 <Separator />
 
                 <Button asChild size="lg" variant="outline" colorPalette="blue">
                   <RouterLink to="/register">Create new account</RouterLink>
                 </Button>
-
-                <Text textAlign="center" color="gray.500" fontSize="sm">
-                  Google / Facebook login can be added here next.
-                </Text>
               </VStack>
             </Box>
           </Box>

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type { AxiosError } from "axios";
 import {
   Alert,
   Box,
@@ -15,10 +14,7 @@ import {
   searchPostsWithAi,
   type AiSearchResponse,
 } from "../api/search-posts-with-ai";
-
-type ApiErrorResponse = {
-  message?: string;
-};
+import { getErrorMessage } from "../../../utils/get-error-message";
 
 export const AiPostSearch = () => {
   const [query, setQuery] = useState("");
@@ -53,9 +49,8 @@ export const AiPostSearch = () => {
         sentiment: result.parsedQuery.sentiment,
         source: result.source,
       });
-    } catch (err: unknown) {
-      const axiosError = err as AxiosError<ApiErrorResponse>;
-      setError(axiosError.response?.data?.message || "AI search failed");
+    } catch (err) {
+      setError(getErrorMessage(err, "AI search failed"));
     } finally {
       setLoading(false);
     }

@@ -1,10 +1,17 @@
 import { apiClient } from "../../../api/client";
-import type { PaginatedPostsResponse } from "../types/post.types";
+import type { CreatePostDto } from "../../../api/dtos/posts/create-post.dto";
+import type { UpdatePostDto } from "../../../api/dtos/posts/update-post.dto";
+import type {
+  PaginatedPostsResponse,
+  Post,
+  ToggleLikeResponse,
+} from "../types/post.types";
 
 export async function getPosts(skip = 0, limit = 10) {
   const res = await apiClient.get<PaginatedPostsResponse>("/posts", {
     params: { skip, limit },
   });
+
   return res.data;
 }
 
@@ -12,10 +19,11 @@ export async function getMyPosts(skip = 0, limit = 10) {
   const res = await apiClient.get<PaginatedPostsResponse>("/posts/my", {
     params: { skip, limit },
   });
+
   return res.data;
 }
 
-export async function createPost(data: { text: string; image?: File | null }) {
+export async function createPost(data: CreatePostDto) {
   const formData = new FormData();
   formData.append("text", data.text);
 
@@ -23,7 +31,7 @@ export async function createPost(data: { text: string; image?: File | null }) {
     formData.append("image", data.image);
   }
 
-  const res = await apiClient.post("/posts", formData, {
+  const res = await apiClient.post<Post>("/posts", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -32,10 +40,7 @@ export async function createPost(data: { text: string; image?: File | null }) {
   return res.data;
 }
 
-export async function updatePost(
-  id: string,
-  data: { text?: string; image?: File | null }
-) {
+export async function updatePost(id: string, data: UpdatePostDto) {
   const formData = new FormData();
 
   if (typeof data.text === "string") {
@@ -46,7 +51,7 @@ export async function updatePost(
     formData.append("image", data.image);
   }
 
-  const res = await apiClient.put(`/posts/${id}`, formData, {
+  const res = await apiClient.put<Post>(`/posts/${id}`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -60,10 +65,6 @@ export async function deletePost(id: string) {
 }
 
 export async function toggleLike(id: string) {
-  const res = await apiClient.post(`/posts/${id}/like`);
-  return res.data as {
-    postId: string;
-    likesCount: number;
-    likedByMe: boolean;
-  };
+  const res = await apiClient.post<ToggleLikeResponse>(`/posts/${id}/like`);
+  return res.data;
 }
