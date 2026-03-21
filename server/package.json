@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json",
+    "build:prod": "tsc -p tsconfig_prod.json",
+    "start:prod": "node ./dist/src/server.js",
+    "prod": "cp .envprod .env && npm run build:prod && pm2 restart ecosystem.config.js --env production || pm2 start ecosystem.config.js --env production",
     "test": "jest --detectOpenHandles --forceExit"
   },
   "keywords": [],
