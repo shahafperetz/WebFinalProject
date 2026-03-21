@@ -11,7 +11,7 @@ import authRoutes from "./routes/auth_routes";
 import userRoutes from "./routes/user_routes";
 import postRoutes from "./routes/post_routes";
 import commentRoutes from "./routes/comment_routes";
-import aiRoutes from "./ai/ai.routes";
+import aiRoutes from "./routes/ai.routes";
 
 dotenv.config();
 

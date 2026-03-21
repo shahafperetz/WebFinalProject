@@ -1,5 +1,5 @@
 import express from "express";
-import aiController from "./ai.controller";
+import aiController from "../controllers/ai.controller";
 import { authMiddleware } from "../middleware/auth_middleware";
 
 const router = express.Router();
