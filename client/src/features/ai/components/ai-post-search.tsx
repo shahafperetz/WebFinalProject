@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Box,
@@ -15,18 +15,29 @@ import {
   type AiSearchResponse,
 } from "../api/search-posts-with-ai";
 import { getErrorMessage } from "../../../utils/get-error-message";
+import type { Post } from "../../posts/types/post.types";
 
-export const AiPostSearch = () => {
+type AiPostSearchProps = {
+  onResultsChange: (results: Post[] | null) => void;
+  resetSignal: number;
+};
+
+export const AiPostSearch = ({
+  onResultsChange,
+  resetSignal,
+}: AiPostSearchProps) => {
   const [query, setQuery] = useState("");
   const [items, setItems] = useState<AiSearchResponse["items"]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [meta, setMeta] = useState<{
-    keywords: string[];
-    category: string | null;
-    sentiment: "positive" | "negative" | "neutral" | null;
-    source: "ai" | "fallback";
-  } | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  useEffect(() => {
+    setQuery("");
+    setItems([]);
+    setError("");
+    setHasSearched(false);
+  }, [resetSignal]);
 
   const handleSearch = async () => {
     const trimmed = query.trim();
@@ -39,18 +50,17 @@ export const AiPostSearch = () => {
     try {
       setLoading(true);
       setError("");
+      setHasSearched(true);
 
       const result = await searchPostsWithAi(trimmed);
+      const filteredItems = result.items.filter((post) => post.owner?._id);
 
-      setItems(result.items);
-      setMeta({
-        keywords: result.parsedQuery.keywords,
-        category: result.parsedQuery.category,
-        sentiment: result.parsedQuery.sentiment,
-        source: result.source,
-      });
-    } catch (err) {
+      setItems(filteredItems);
+      onResultsChange(filteredItems);
+    } catch (err: unknown) {
       setError(getErrorMessage(err, "AI search failed"));
+      setItems([]);
+      onResultsChange([]);
     } finally {
       setLoading(false);
     }
@@ -59,8 +69,9 @@ export const AiPostSearch = () => {
   const handleClear = () => {
     setQuery("");
     setItems([]);
-    setMeta(null);
     setError("");
+    setHasSearched(false);
+    onResultsChange(null);
   };
 
   return (
@@ -70,11 +81,15 @@ export const AiPostSearch = () => {
           Smart AI Search
         </Text>
 
+        <Text fontSize="sm" color="gray.600" mb={4}>
+          Search posts using natural language.
+        </Text>
+
         <HStack>
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Try: happy travel posts, study posts, beach photos..."
+            placeholder="Search posts with AI..."
           />
 
           <Button onClick={handleSearch} colorPalette="blue" disabled={loading}>
@@ -87,7 +102,7 @@ export const AiPostSearch = () => {
         </HStack>
 
         {error ? (
-          <Alert.Root status="error" mt={3}>
+          <Alert.Root status="error" mt={4}>
             <Alert.Indicator />
             <Alert.Content>
               <Alert.Title>Error</Alert.Title>
@@ -102,25 +117,19 @@ export const AiPostSearch = () => {
             <Text>Searching...</Text>
           </HStack>
         ) : null}
-
-        {meta ? (
-          <Box mt={4} p={3} bg="gray.50" rounded="md">
-            <Text fontWeight="semibold">AI interpretation</Text>
-            <Text>Keywords: {meta.keywords.join(", ") || "None"}</Text>
-            <Text>Category: {meta.category || "None"}</Text>
-            <Text>Sentiment: {meta.sentiment || "None"}</Text>
-            <Text>Source: {meta.source}</Text>
-          </Box>
-        ) : null}
       </Box>
 
-      {items.length ? (
+      {hasSearched && !loading && !error && !items.length ? (
+        <Box p={6} borderWidth="1px" rounded="xl" bg="white">
+          <Text color="gray.500">No matching posts were found.</Text>
+        </Box>
+      ) : null}
+
+      {hasSearched && items.length ? (
         <VStack align="stretch" gap={6}>
-          {items
-            .filter((post) => post.owner?._id)
-            .map((post) => (
-              <PostCard key={post._id} post={post} />
-            ))}
+          {items.map((post) => (
+            <PostCard key={post._id} post={post} />
+          ))}
         </VStack>
       ) : null}
     </VStack>
