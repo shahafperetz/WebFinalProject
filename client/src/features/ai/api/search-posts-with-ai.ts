@@ -13,9 +13,12 @@ export type AiSearchResponse = {
 };
 
 export const searchPostsWithAi = async (query: string) => {
-  const response = await apiClient.post<AiSearchResponse>("/ai/search-posts", {
-    query,
-  });
+  const response = await apiClient.post<AiSearchResponse>(
+    "api/ai/search-posts",
+    {
+      query,
+    }
+  );
 
   return response.data;
 };
