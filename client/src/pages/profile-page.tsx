@@ -18,6 +18,7 @@ import { EditProfileForm } from "../features/users/components/edit-profile-form"
 import { useMyPosts } from "../features/posts/hooks/use-my-posts";
 import { usePosts } from "../features/posts/hooks/use-posts";
 import { PostCard } from "../features/posts/components/post-card";
+import { getImageUrl } from "../utils/get-image-url";
 
 export const ProfilePage = () => {
   const { id = "" } = useParams();
@@ -91,9 +92,7 @@ export const ProfilePage = () => {
     );
   }
 
-  const avatarUrl = profile.image
-    ? `http://localhost:3001${profile.image}`
-    : "";
+  const avatarUrl = profile.image ? getImageUrl(profile.image) : "";
 
   return (
     <Box>

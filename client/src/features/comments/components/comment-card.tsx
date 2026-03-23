@@ -1,14 +1,13 @@
 import { Avatar, Card, HStack, Text, VStack } from "@chakra-ui/react";
 import type { Comment } from "../types/comment.types";
+import { getImageUrl } from "../../../utils/get-image-url";
 
 type Props = {
   comment: Comment;
 };
 
 export const CommentCard = ({ comment }: Props) => {
-  const avatarUrl = comment.owner.image
-    ? `http://localhost:3001${comment.owner.image}`
-    : "";
+  const avatarUrl = comment.owner.image ? getImageUrl(comment.owner.image) : "";
 
   return (
     <Card.Root>

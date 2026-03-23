@@ -7,6 +7,7 @@ import { updateMyInfo } from "../api/users.api";
 import type { User } from "../types/user.types";
 import { useAuthStore } from "../../../store/auth.store";
 import { z } from "zod";
+import { getImageUrl } from "../../../utils/get-image-url";
 
 const editProfileSchema = z.object({
   username: z
@@ -29,8 +30,14 @@ export const EditProfileForm = ({ user, onSuccess }: EditProfileFormProps) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const previewUrl = useMemo(() => {
-    if (selectedImage) return URL.createObjectURL(selectedImage);
-    if (user.image) return `http://localhost:3001${user.image}`;
+    if (selectedImage) {
+      return URL.createObjectURL(selectedImage);
+    }
+
+    if (user.image) {
+      return getImageUrl(user.image);
+    }
+
     return "";
   }, [selectedImage, user.image]);
 

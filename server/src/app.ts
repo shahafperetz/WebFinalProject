@@ -40,7 +40,14 @@ const options = {
       version: "1.0.0",
       description: "API for the Web Application Course final project",
     },
-    servers: [{ url: "http://localhost:3001" }],
+    servers: [
+      {
+        url:
+          process.env.NODE_ENV === "production"
+            ? "https://node16.cs.colman.ac.il"
+            : "http://localhost:3001",
+      },
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {

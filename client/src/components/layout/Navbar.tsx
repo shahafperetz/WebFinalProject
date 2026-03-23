@@ -12,6 +12,7 @@ import {
 import { NavLink } from "react-router-dom";
 import { useAuthStore } from "../../store/auth.store";
 import { useAuth } from "../../features/auth/hooks/use-auth";
+import { getImageUrl } from "../../utils/get-image-url";
 
 type NavButtonProps = {
   to: string;
@@ -39,7 +40,7 @@ export function Navbar() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { logoutMutation } = useAuth();
 
-  const avatarUrl = user?.image ? `http://localhost:3001${user.image}` : "";
+  const avatarUrl = user?.image ? getImageUrl(user.image) : "";
 
   return (
     <Box
