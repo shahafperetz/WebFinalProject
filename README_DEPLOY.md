@@ -64,7 +64,7 @@ Create `client/.env.production` from `client/.env.example`
 Example:
 
 ```env
-VITE_API_BASE_URL=https://node16.cs.colman.ac.il/api
+
 VITE_GOOGLE_CLIENT_ID=CHANGE_ME
 ```
 

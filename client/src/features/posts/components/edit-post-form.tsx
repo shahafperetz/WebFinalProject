@@ -17,6 +17,7 @@ import {
   type UpdatePostFormValues,
 } from "../schemas/update-post.schema";
 import type { Post } from "../types/post.types";
+import { getImageUrl } from "../../../utils/get-image-url";
 
 type EditPostFormProps = {
   post: Post;
@@ -29,7 +30,7 @@ export const EditPostForm = ({ post, onSuccess }: EditPostFormProps) => {
 
   const previewUrl = useMemo(() => {
     if (selectedImage) return URL.createObjectURL(selectedImage);
-    if (post.image) return `http://localhost:3001${post.image}`;
+    if (post.image) return getImageUrl(post.image);
     return "";
   }, [selectedImage, post.image]);
 

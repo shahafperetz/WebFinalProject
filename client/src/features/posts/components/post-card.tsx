@@ -16,6 +16,7 @@ import { useToggleLike } from "../hooks/use-toggle-like";
 import { useDeletePost } from "../hooks/use-delete-post";
 import { EditPostForm } from "./edit-post-form";
 import type { Post } from "../types/post.types";
+import { getImageUrl } from "../../../utils/get-image-url";
 
 type PostCardProps = {
   post: Post;
@@ -38,8 +39,8 @@ export const PostCard = ({ post }: PostCardProps) => {
   const isOwner =
     !!ownerId && (currentUser?._id === ownerId || currentUser?.id === ownerId);
 
-  const postImageUrl = post.image ? `http://localhost:3001${post.image}` : "";
-  const avatarUrl = ownerImage ? `http://localhost:3001${ownerImage}` : "";
+  const postImageUrl = post.image ? getImageUrl(post.image) : "";
+  const avatarUrl = ownerImage ? getImageUrl(ownerImage) : "";
 
   const handleLikeClick = () => {
     if (!isAuthenticated) return;

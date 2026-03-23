@@ -1,8 +1,11 @@
 import axios from "axios";
 import { useAuthStore } from "../store/auth.store";
 
+const baseURL =
+  import.meta.env.MODE === "production" ? "/api" : "http://localhost:3001";
+
 export const apiClient = axios.create({
-  baseURL: "http://localhost:3001",
+  baseURL,
   withCredentials: true,
 });
 
@@ -21,7 +24,10 @@ apiClient.interceptors.response.use(
   (error) => {
     const status = error?.response?.status;
 
-    if (status === 401 || status === 403) {
+    if (
+      (status === 401 || status === 403) &&
+      window.location.pathname !== "/login"
+    ) {
       useAuthStore.getState().clearAuth();
       window.location.href = "/login";
     }
