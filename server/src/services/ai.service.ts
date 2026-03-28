@@ -1,11 +1,17 @@
 import "dotenv/config";
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import mongoose from "mongoose";
 import Post from "../models/post_model";
 import { TranslatePostResponseDto } from "../dtos/ai.dto";
 
-const client = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
+const apiKey = process.env.OPENAI_API_KEY;
+
+if (!apiKey) {
+  throw new Error("Missing OPENAI_API_KEY in environment variables");
+}
+
+const client = new OpenAI({
+  apiKey,
 });
 
 const safeJsonParse = (
@@ -62,7 +68,7 @@ const translatePostToEnglish = async (
     throw new Error("Post text is empty");
   }
 
-  const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
   const prompt = `
 You are given a social media post.
@@ -80,29 +86,33 @@ Post:
 """${originalText}"""
 `.trim();
 
-  const response = await client.models.generateContent({
-    model,
-    contents: prompt,
-  });
+  try {
+    const response = await client.responses.create({
+      model,
+      input: prompt,
+    });
 
-  const rawText = response.text?.trim();
+    const rawText = response.output_text?.trim();
 
-  if (!rawText) {
-    throw new Error("AI returned empty response");
+    if (!rawText) {
+      throw new Error("AI returned empty response");
+    }
+
+    const parsed = safeJsonParse(rawText);
+
+    if (!parsed) {
+      throw new Error(`AI returned invalid JSON: ${rawText}`);
+    }
+
+    return {
+      postId: String(post._id),
+      originalText,
+      detectedLanguage: parsed.detectedLanguage,
+      translatedText: parsed.translatedText,
+    };
+  } catch (error: any) {
+    throw new Error(error?.message || "AI translation failed");
   }
-
-  const parsed = safeJsonParse(rawText);
-
-  if (!parsed) {
-    throw new Error("AI returned invalid JSON");
-  }
-
-  return {
-    postId: String(post._id),
-    originalText,
-    detectedLanguage: parsed.detectedLanguage,
-    translatedText: parsed.translatedText,
-  };
 };
 
 export default {
