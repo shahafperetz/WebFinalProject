@@ -6,8 +6,8 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- *   - name: Auth
- *     description: Authentication API
+ *   name: Auth
+ *   description: Authentication endpoints
  */
 
 /**
@@ -22,7 +22,10 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [username, email, password]
+ *             required:
+ *               - username
+ *               - email
+ *               - password
  *             properties:
  *               username:
  *                 type: string
@@ -32,7 +35,7 @@ const router = express.Router();
  *                 type: string
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: User created successfully
  */
 router.post("/register", authController.register);
 
@@ -40,7 +43,7 @@ router.post("/register", authController.register);
  * @swagger
  * /auth/login:
  *   post:
- *     summary: Login and get access token (refresh token saved as HttpOnly cookie)
+ *     summary: Login user
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -48,7 +51,9 @@ router.post("/register", authController.register);
  *         application/json:
  *           schema:
  *             type: object
- *             required: [username, password]
+ *             required:
+ *               - username
+ *               - password
  *             properties:
  *               username:
  *                 type: string
@@ -56,7 +61,7 @@ router.post("/register", authController.register);
  *                 type: string
  *     responses:
  *       200:
- *         description: Logged in successfully
+ *         description: Login successful
  */
 router.post("/login", authController.login);
 
@@ -64,7 +69,7 @@ router.post("/login", authController.login);
  * @swagger
  * /auth/google:
  *   post:
- *     summary: Login with Google (refresh token saved as HttpOnly cookie)
+ *     summary: Login with Google
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -72,7 +77,8 @@ router.post("/login", authController.login);
  *         application/json:
  *           schema:
  *             type: object
- *             required: [credential]
+ *             required:
+ *               - credential
  *             properties:
  *               credential:
  *                 type: string
@@ -86,10 +92,8 @@ router.post("/google", authController.googleSignin);
  * @swagger
  * /auth/refresh:
  *   post:
- *     summary: Refresh access token (uses refreshToken cookie; also accepts body for swagger)
+ *     summary: Refresh access token
  *     tags: [Auth]
- *     security:
- *       - cookieAuth: []
  *     requestBody:
  *       required: false
  *       content:
@@ -99,10 +103,9 @@ router.post("/google", authController.googleSignin);
  *             properties:
  *               refreshToken:
  *                 type: string
- *                 description: Optional - mainly for Swagger testing
  *     responses:
  *       200:
- *         description: New access token returned
+ *         description: Token refreshed successfully
  */
 router.post("/refresh", authController.refresh);
 
@@ -110,23 +113,11 @@ router.post("/refresh", authController.refresh);
  * @swagger
  * /auth/logout:
  *   post:
- *     summary: Logout (clears refreshToken cookie)
+ *     summary: Logout user
  *     tags: [Auth]
- *     security:
- *       - cookieAuth: []
- *     requestBody:
- *       required: false
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               refreshToken:
- *                 type: string
- *                 description: Optional - mainly for Swagger testing
  *     responses:
  *       200:
- *         description: Logged out successfully
+ *         description: Logout successful
  */
 router.post("/logout", authController.logout);
 

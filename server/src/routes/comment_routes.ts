@@ -7,15 +7,15 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- *   - name: Comments
- *     description: Comments API
+ *   name: Comments
+ *   description: Comment endpoints
  */
 
 /**
  * @swagger
  * /posts/{postId}/comments:
  *   get:
- *     summary: Get comments for a post (paged)
+ *     summary: Get comments for a post
  *     tags: [Comments]
  *     parameters:
  *       - in: path
@@ -33,15 +33,18 @@ const router = express.Router();
  *           type: integer
  *     responses:
  *       200:
- *         description: Comments list
+ *         description: Comments returned successfully
  */
-router.get("/posts/:postId/comments", commentController.getCommentsByPost);
+router.get(
+  "/posts/:postId/comments",
+  commentController.getCommentsByPost
+);
 
 /**
  * @swagger
  * /posts/{postId}/comments:
  *   post:
- *     summary: Add comment to a post
+ *     summary: Add a comment to a post
  *     tags: [Comments]
  *     security:
  *       - bearerAuth: []
@@ -57,14 +60,19 @@ router.get("/posts/:postId/comments", commentController.getCommentsByPost);
  *         application/json:
  *           schema:
  *             type: object
- *             required: [text]
+ *             required:
+ *               - text
  *             properties:
  *               text:
  *                 type: string
  *     responses:
  *       201:
- *         description: Comment created
+ *         description: Comment created successfully
  */
-router.post("/posts/:postId/comments", authMiddleware, commentController.addComment);
+router.post(
+  "/posts/:postId/comments",
+  authMiddleware,
+  commentController.addComment
+);
 
 export default router;

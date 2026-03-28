@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Comment from "../models/comment_model";
 import Post from "../models/post_model";
+import { CreateCommentDto } from "../dtos/comment.dto";
 
 const parseIntSafe = (value: any, fallback: number) => {
   const n = Number.parseInt(String(value), 10);
@@ -10,17 +11,27 @@ const parseIntSafe = (value: any, fallback: number) => {
 
 const addComment = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?._id as string | undefined;
-    if (!userId) return res.status(401).send("Access Denied");
+    const user = (req as any).user;
+    const userId = user?._id as string | undefined;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
 
     const { postId } = req.params;
-    if (!mongoose.isValidObjectId(postId)) return res.status(400).send("Invalid post id");
+    if (!mongoose.isValidObjectId(postId)) {
+      return res.status(400).json({ message: "Invalid post id" });
+    }
 
-    const { text } = req.body as { text?: string };
-    if (!text || text.trim().length === 0) return res.status(400).send("Text is required");
+    const { text } = req.body as CreateCommentDto;
+    if (!text || text.trim().length === 0) {
+      return res.status(400).json({ message: "Text is required" });
+    }
 
     const postExists = await Post.exists({ _id: postId });
-    if (!postExists) return res.status(404).send("Post not found");
+    if (!postExists) {
+      return res.status(404).json({ message: "Post not found" });
+    }
 
     const comment = await Comment.create({
       postId,
@@ -28,7 +39,6 @@ const addComment = async (req: Request, res: Response) => {
       text: text.trim(),
     });
 
-    // עדכון מונה תגובות בפוסט כדי להציג בפיד
     await Post.findByIdAndUpdate(postId, { $inc: { commentsCount: 1 } });
 
     const populated = await Comment.findById(comment._id)
@@ -37,14 +47,17 @@ const addComment = async (req: Request, res: Response) => {
 
     return res.status(201).json(populated);
   } catch {
-    return res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 const getCommentsByPost = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params;
-    if (!mongoose.isValidObjectId(postId)) return res.status(400).send("Invalid post id");
+
+    if (!mongoose.isValidObjectId(postId)) {
+      return res.status(400).json({ message: "Invalid post id" });
+    }
 
     const skip = parseIntSafe(req.query.skip, 0);
     const limit = Math.min(parseIntSafe(req.query.limit, 20), 50);
@@ -58,7 +71,7 @@ const getCommentsByPost = async (req: Request, res: Response) => {
 
     return res.status(200).json({ skip, limit, items: comments });
   } catch {
-    return res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
