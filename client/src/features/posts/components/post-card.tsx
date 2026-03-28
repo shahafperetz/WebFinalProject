@@ -17,6 +17,8 @@ import { useDeletePost } from "../hooks/use-delete-post";
 import { EditPostForm } from "./edit-post-form";
 import type { Post } from "../types/post.types";
 import { getImageUrl } from "../../../utils/get-image-url";
+import { TranslatePostButton } from "../../ai/components/translate-post-button";
+import { Pencil, Trash2 } from "lucide-react";
 
 type PostCardProps = {
   post: Post;
@@ -88,7 +90,10 @@ export const PostCard = ({ post }: PostCardProps) => {
               >
                 <Dialog.Trigger asChild>
                   <Button size="sm" variant="ghost">
-                    Edit
+                    <HStack gap={2}>
+                      <Pencil size={16} />
+                      <span>Edit</span>
+                    </HStack>
                   </Button>
                 </Dialog.Trigger>
 
@@ -117,7 +122,10 @@ export const PostCard = ({ post }: PostCardProps) => {
               >
                 <Dialog.Trigger asChild>
                   <Button size="sm" variant="ghost" colorPalette="red">
-                    Delete
+                    <HStack gap={2}>
+                      <Trash2 size={16} />
+                      <span>Delete</span>
+                    </HStack>
                   </Button>
                 </Dialog.Trigger>
 
@@ -160,7 +168,10 @@ export const PostCard = ({ post }: PostCardProps) => {
           ) : null}
         </HStack>
 
-        <Text>{post.text}</Text>
+        <VStack align="stretch" gap={2}>
+          <Text>{post.text}</Text>
+          <TranslatePostButton postId={post._id} originalText={post.text} />
+        </VStack>
 
         {postImageUrl ? (
           <Box overflow="hidden" borderRadius="xl">
