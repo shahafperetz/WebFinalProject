@@ -1,39 +1,50 @@
 import { Request, Response } from "express";
 import User from "../models/user_model";
+import { UpdateMyInfoDto } from "../dtos/user.dto";
 
 const getMyInfo = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?._id;
-    if (!userId) return res.status(401).send("Access Denied");
+    const user = (req as any).user;
+    const userId = user?._id;
 
-    const user = await User.findById(userId).select("_id username email image");
-    if (!user) return res.status(404).send("User not found");
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
 
-    res.status(200).json(user);
+    const foundUser = await User.findById(userId).select("_id username email image");
+    if (!foundUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(foundUser);
   } catch {
-    res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 const getById = async (req: Request, res: Response) => {
   try {
-    const user = await User.findById(req.params.id).select(
-      "_id username email image"
-    );
-    if (!user) return res.status(404).send("User not found");
+    const user = await User.findById(req.params.id).select("_id username image");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch {
-    res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 const updateMyInfo = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?._id;
-    if (!userId) return res.status(401).send("Access Denied");
+    const user = (req as any).user;
+    const userId = user?._id;
 
-    const { username } = req.body as { username?: string };
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
+
+    const { username } = req.body as UpdateMyInfoDto;
 
     const file = (req as any).file as Express.Multer.File | undefined;
     const imagePath = file ? `/uploads/profile/${file.filename}` : undefined;
@@ -41,39 +52,38 @@ const updateMyInfo = async (req: Request, res: Response) => {
     const update: { username?: string; image?: string } = {};
 
     if (username && username.trim().length > 0) {
+      const trimmedUsername = username.trim();
+
       const existing = await User.findOne({
-        username: username.trim(),
+        username: trimmedUsername,
         _id: { $ne: userId },
       });
 
       if (existing) {
-        return res.status(400).send("Username already taken");
+        return res.status(400).json({ message: "Username already taken" });
       }
 
-      update.username = username.trim();
+      update.username = trimmedUsername;
     }
 
     if (imagePath) {
       update.image = imagePath;
     }
 
-    // אם אין שום שינוי – נחזיר את המשתמש הקיים (מונע 400 בטסטים)
     if (Object.keys(update).length === 0) {
-      const user = await User.findById(userId).select(
-        "_id username email image"
-      );
-      return res.status(200).json(user);
+      const currentUser = await User.findById(userId).select("_id username email image");
+      return res.status(200).json(currentUser);
     }
 
-    const updated = await User.findByIdAndUpdate(userId, update, {
+    const updatedUser = await User.findByIdAndUpdate(userId, update, {
       returnDocument: "after",
       runValidators: true,
       select: "_id username email image",
     });
 
-    res.status(200).json(updated);
+    return res.status(200).json(updatedUser);
   } catch (err: any) {
-    res.status(400).send(err?.message || "Bad request");
+    return res.status(400).json({ message: err?.message || "Bad request" });
   }
 };
 

@@ -18,12 +18,14 @@ const makeStorage = (subFolder: "profile" | "posts") => {
     },
     filename: (_req, file, cb) => {
       const ext = path.extname(file.originalname).toLowerCase();
+
       const baseName = path
         .basename(file.originalname, ext)
         .replace(/[^a-zA-Z0-9_-]/g, "")
         .slice(0, 40);
 
       const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+
       cb(null, `${baseName || "image"}-${unique}${ext}`);
     },
   });
@@ -38,8 +40,14 @@ const imageFileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
   const allowedExt = [".jpg", ".jpeg", ".png", ".webp"];
 
+  if (!ext) {
+    return cb(new Error("File must have an extension"));
+  }
+
   if (!allowedExt.includes(ext)) {
-    return cb(new Error("Only image files are allowed"));
+    return cb(
+      new Error("Only image files (.jpg, .jpeg, .png, .webp) are allowed")
+    );
   }
 
   cb(null, true);

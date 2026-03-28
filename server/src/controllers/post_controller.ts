@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
-import Post from "../models/post_model";
 import mongoose from "mongoose";
+import Post from "../models/post_model";
+import {
+  CreatePostDto,
+  UpdatePostDto,
+} from "../dtos/post.dto";
 
 const parseIntSafe = (value: any, fallback: number) => {
   const n = Number.parseInt(String(value), 10);
@@ -9,11 +13,17 @@ const parseIntSafe = (value: any, fallback: number) => {
 
 const createPost = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?._id as string | undefined;
-    if (!userId) return res.status(401).send("Access Denied");
+    const user = (req as any).user;
+    const userId = user?._id;
 
-    const { text } = req.body as { text?: string };
-    if (!text || text.trim().length === 0) return res.status(400).send("Text is required");
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
+
+    const { text } = req.body as CreatePostDto;
+    if (!text || text.trim().length === 0) {
+      return res.status(400).json({ message: "Text is required" });
+    }
 
     const file = (req as any).file as Express.Multer.File | undefined;
     const imagePath = file ? `/uploads/posts/${file.filename}` : "";
@@ -29,12 +39,15 @@ const createPost = async (req: Request, res: Response) => {
     const populated = await Post.findById(post._id).populate("owner", "_id username image");
     return res.status(201).json(populated);
   } catch (err: any) {
-    return res.status(400).send(err?.message || "Bad request");
+    return res.status(400).json({ message: err?.message || "Bad request" });
   }
 };
 
 const getPosts = async (req: Request, res: Response) => {
   try {
+    const user = (req as any).user;
+    const userId = user?._id;
+
     const skip = parseIntSafe(req.query.skip, 0);
     const limit = Math.min(parseIntSafe(req.query.limit, 10), 50);
 
@@ -45,30 +58,36 @@ const getPosts = async (req: Request, res: Response) => {
       .populate("owner", "_id username image")
       .select("_id owner text image likes commentsCount createdAt updatedAt");
 
-    const viewerId = (req as any).user?._id ? String((req as any).user._id) : null;
+    const viewerId = userId ? String(userId) : null;
 
-    const response = posts.map((p: any) => ({
-      _id: p._id,
-      owner: p.owner,
-      text: p.text,
-      image: p.image,
-      commentsCount: p.commentsCount,
-      likesCount: Array.isArray(p.likes) ? p.likes.length : 0,
-      likedByMe: viewerId ? (p.likes || []).some((id: any) => String(id) === viewerId) : false,
-      createdAt: p.createdAt,
-      updatedAt: p.updatedAt,
+    const items = posts.map((post: any) => ({
+      _id: post._id,
+      owner: post.owner,
+      text: post.text,
+      image: post.image,
+      commentsCount: post.commentsCount,
+      likesCount: Array.isArray(post.likes) ? post.likes.length : 0,
+      likedByMe: viewerId
+        ? (post.likes || []).some((id: any) => String(id) === viewerId)
+        : false,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
     }));
 
-    return res.status(200).json({ skip, limit, items: response });
+    return res.status(200).json({ skip, limit, items });
   } catch {
-    return res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 const getMyPosts = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?._id as string | undefined;
-    if (!userId) return res.status(401).send("Access Denied");
+    const user = (req as any).user;
+    const userId = user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
 
     const skip = parseIntSafe(req.query.skip, 0);
     const limit = Math.min(parseIntSafe(req.query.limit, 10), 50);
@@ -82,36 +101,45 @@ const getMyPosts = async (req: Request, res: Response) => {
 
     const viewerId = String(userId);
 
-    const response = posts.map((p: any) => ({
-      _id: p._id,
-      owner: p.owner,
-      text: p.text,
-      image: p.image,
-      commentsCount: p.commentsCount,
-      likesCount: Array.isArray(p.likes) ? p.likes.length : 0,
-      likedByMe: (p.likes || []).some((id: any) => String(id) === viewerId),
-      createdAt: p.createdAt,
-      updatedAt: p.updatedAt,
+    const items = posts.map((post: any) => ({
+      _id: post._id,
+      owner: post.owner,
+      text: post.text,
+      image: post.image,
+      commentsCount: post.commentsCount,
+      likesCount: Array.isArray(post.likes) ? post.likes.length : 0,
+      likedByMe: (post.likes || []).some((id: any) => String(id) === viewerId),
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
     }));
 
-    return res.status(200).json({ skip, limit, items: response });
+    return res.status(200).json({ skip, limit, items });
   } catch {
-    return res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 const updatePost = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?._id as string | undefined;
-    if (!userId) return res.status(401).send("Access Denied");
+    const user = (req as any).user;
+    const userId = user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
 
     const { id } = req.params;
     const post = await Post.findById(id);
-    if (!post) return res.status(404).send("Post not found");
 
-    if (String(post.owner) !== String(userId)) return res.status(403).send("Not allowed");
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
 
-    const { text } = req.body as { text?: string };
+    if (String(post.owner) !== String(userId)) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    const { text } = req.body as UpdatePostDto;
     const file = (req as any).file as Express.Multer.File | undefined;
     const imagePath = file ? `/uploads/posts/${file.filename}` : undefined;
 
@@ -124,69 +152,94 @@ const updatePost = async (req: Request, res: Response) => {
     }
 
     if (hasTextUpdate) {
-      const trimmed = text!.trim();
-      if (trimmed.length === 0) return res.status(400).send("Text is required");
-      post.text = trimmed;
+      const trimmedText = text!.trim();
+      if (trimmedText.length === 0) {
+        return res.status(400).json({ message: "Text is required" });
+      }
+      post.text = trimmedText;
     }
 
-    if (hasImageUpdate) post.image = imagePath!;
+    if (hasImageUpdate) {
+      post.image = imagePath!;
+    }
 
     await post.save();
 
     const populated = await Post.findById(id).populate("owner", "_id username image");
     return res.status(200).json(populated);
   } catch (err: any) {
-    return res.status(400).send(err?.message || "Bad request");
+    return res.status(400).json({ message: err?.message || "Bad request" });
   }
 };
 
 const deletePost = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?._id as string | undefined;
-    if (!userId) return res.status(401).send("Access Denied");
+    const user = (req as any).user;
+    const userId = user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
 
     const { id } = req.params;
     const post = await Post.findById(id);
-    if (!post) return res.status(404).send("Post not found");
 
-    if (String(post.owner) !== String(userId)) return res.status(403).send("Not allowed");
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    if (String(post.owner) !== String(userId)) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
 
     await Post.findByIdAndDelete(id);
-    return res.status(200).send("Deleted");
+    return res.status(200).json({ message: "Deleted" });
   } catch {
-    return res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 const toggleLike = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?._id as string | undefined;
-    if (!userId) return res.status(401).send("Access Denied");
+    const user = (req as any).user;
+    const userId = user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
 
     const { id } = req.params;
-    if (!mongoose.isValidObjectId(id)) return res.status(400).send("Invalid post id");
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid post id" });
+    }
 
     const post = await Post.findById(id).select("_id likes");
-    if (!post) return res.status(404).send("Post not found");
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
 
-    const alreadyLiked = (post.likes || []).some((uid: any) => String(uid) === String(userId));
+    const alreadyLiked = (post.likes || []).some(
+      (likedUserId: any) => String(likedUserId) === String(userId)
+    );
 
     const update = alreadyLiked
       ? { $pull: { likes: userId } }
       : { $addToSet: { likes: userId } };
 
-    const updated = await Post.findByIdAndUpdate(
-      id,
-      update,
-      { returnDocument: "after" }
-    ).select("_id likes");
+    const updated = await Post.findByIdAndUpdate(id, update, {
+      returnDocument: "after",
+    }).select("_id likes");
 
     const likesCount = updated?.likes?.length || 0;
     const likedByMe = !alreadyLiked;
 
-    return res.status(200).json({ postId: id, likesCount, likedByMe });
+    return res.status(200).json({
+      postId: id,
+      likesCount,
+      likedByMe,
+    });
   } catch {
-    return res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
