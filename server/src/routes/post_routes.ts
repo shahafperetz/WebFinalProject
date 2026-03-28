@@ -1,6 +1,9 @@
 import express from "express";
 import postController from "../controllers/post_controller";
-import { authMiddleware } from "../middleware/auth_middleware";
+import {
+  authMiddleware,
+  optionalAuthMiddleware,
+} from "../middleware/auth_middleware";
 import { uploadPostImage } from "../middleware/upload_middleware";
 import { multerErrorHandler } from "../middleware/multer_error_middleware";
 
@@ -32,7 +35,7 @@ const router = express.Router();
  *       200:
  *         description: Posts returned successfully
  */
-router.get("/", postController.getPosts);
+router.get("/", optionalAuthMiddleware, postController.getPosts);
 
 /**
  * @swagger
