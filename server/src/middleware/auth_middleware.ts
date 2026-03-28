@@ -1,10 +1,17 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-export type JwtPayload = {
+type JwtPayload = {
   _id: string;
-  iat?: number;
-  exp?: number;
+};
+
+const extractTokenFromHeader = (authHeader?: string) => {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authHeader.split(" ")[1];
+  return token || null;
 };
 
 export const authMiddleware = (
@@ -12,24 +19,39 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith("Bearer ")
-    ? authHeader.split(" ")[1]
-    : undefined;
-
-  if (!token) {
-    return res.status(401).json({ message: "Access denied" });
-  }
-
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET!
-    ) as JwtPayload;
+    const token = extractTokenFromHeader(req.headers.authorization);
 
-    (req as any).user = decoded;
+    if (!token) {
+      return res.status(401).json({ message: "Access denied" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    (req as any).user = { _id: decoded._id };
+
+    next();
+  } catch {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+export const optionalAuthMiddleware = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = extractTokenFromHeader(req.headers.authorization);
+
+    if (!token) {
+      return next();
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    (req as any).user = { _id: decoded._id };
+
     return next();
   } catch {
-    return res.status(403).json({ message: "Invalid token" });
+    return next();
   }
 };
