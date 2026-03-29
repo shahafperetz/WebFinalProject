@@ -96,10 +96,6 @@ export const RegisterPage = () => {
                 <Button asChild size="lg" variant="outline" colorPalette="blue">
                   <RouterLink to="/login">Already have an account?</RouterLink>
                 </Button>
-
-                <Text textAlign="center" color="gray.500" fontSize="sm">
-                  Google / Facebook registration can be added here next.
-                </Text>
               </VStack>
             </Box>
           </Box>
