@@ -1,16 +1,16 @@
 import "dotenv/config";
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import mongoose from "mongoose";
 import Post from "../models/post_model";
 import { TranslatePostResponseDto } from "../dtos/ai.dto";
 
-const apiKey = process.env.OPENAI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY;
 
 if (!apiKey) {
-  throw new Error("Missing OPENAI_API_KEY in environment variables");
+  throw new Error("Missing GEMINI_API_KEY in environment variables");
 }
 
-const client = new OpenAI({
+const ai = new GoogleGenAI({
   apiKey,
 });
 
@@ -68,7 +68,7 @@ const translatePostToEnglish = async (
     throw new Error("Post text is empty");
   }
 
-  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
   const prompt = `
 You are given a social media post.
@@ -87,12 +87,18 @@ Post:
 `.trim();
 
   try {
-    const response = await client.responses.create({
+    console.log("Using Gemini model:", model);
+    console.log(
+      "Gemini key suffix:",
+      process.env.GEMINI_API_KEY?.slice(-6)
+    );
+
+    const response = await ai.models.generateContent({
       model,
-      input: prompt,
+      contents: prompt,
     });
 
-    const rawText = response.output_text?.trim();
+    const rawText = response.text?.trim();
 
     if (!rawText) {
       throw new Error("AI returned empty response");
@@ -111,7 +117,20 @@ Post:
       translatedText: parsed.translatedText,
     };
   } catch (error: any) {
-    throw new Error(error?.message || "AI translation failed");
+    console.error("Gemini translation error:", error);
+
+    const message = String(error?.message || "");
+
+    if (
+      message.includes("429") ||
+      message.includes("RESOURCE_EXHAUSTED")
+    ) {
+      throw new Error(
+        "Gemini quota exceeded. Make sure you are using a key from the correct project and model gemini-2.5-flash."
+      );
+    }
+
+    throw new Error(message || "AI translation failed");
   }
 };
 

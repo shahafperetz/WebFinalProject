@@ -1,5 +1,6 @@
 import express from "express";
 import postController from "../controllers/post_controller";
+import commentController from "../controllers/comment_controller";
 import {
   authMiddleware,
   optionalAuthMiddleware,
@@ -171,5 +172,51 @@ router.delete("/:id", authMiddleware, postController.deletePost);
  *         description: Like updated successfully
  */
 router.post("/:id/like", authMiddleware, postController.toggleLike);
+
+/**
+ * @swagger
+ * /posts/{postId}/comments:
+ *   get:
+ *     summary: Get comments for a post
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: skip
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Comments returned successfully
+ */
+router.get("/:postId/comments", optionalAuthMiddleware, commentController.getCommentsByPost);
+
+/**
+ * @swagger
+ * /posts/{postId}/comments:
+ *   post:
+ *     summary: Add comment to a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       201:
+ *         description: Comment created successfully
+ */
+router.post("/:postId/comments", authMiddleware, commentController.addComment);
 
 export default router;

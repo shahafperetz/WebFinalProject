@@ -19,16 +19,19 @@ const addComment = async (req: Request, res: Response) => {
     }
 
     const { postId } = req.params;
+
     if (!mongoose.isValidObjectId(postId)) {
       return res.status(400).json({ message: "Invalid post id" });
     }
 
     const { text } = req.body as CreateCommentDto;
+
     if (!text || text.trim().length === 0) {
       return res.status(400).json({ message: "Text is required" });
     }
 
     const postExists = await Post.exists({ _id: postId });
+
     if (!postExists) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -39,13 +42,15 @@ const addComment = async (req: Request, res: Response) => {
       text: text.trim(),
     });
 
-    await Post.findByIdAndUpdate(postId, { $inc: { commentsCount: 1 } });
+    await Post.findByIdAndUpdate(postId, {
+      $inc: { commentsCount: 1 },
+    });
 
-    const populated = await Comment.findById(comment._id)
+    const populatedComment = await Comment.findById(comment._id)
       .populate("owner", "_id username image")
       .select("_id postId owner text createdAt updatedAt");
 
-    return res.status(201).json(populated);
+    return res.status(201).json(populatedComment);
   } catch {
     return res.status(500).json({ message: "Server error" });
   }
@@ -69,10 +74,102 @@ const getCommentsByPost = async (req: Request, res: Response) => {
       .populate("owner", "_id username image")
       .select("_id postId owner text createdAt updatedAt");
 
-    return res.status(200).json({ skip, limit, items: comments });
+    return res.status(200).json({
+      skip,
+      limit,
+      items: comments,
+    });
   } catch {
     return res.status(500).json({ message: "Server error" });
   }
 };
 
-export default { addComment, getCommentsByPost };
+const updateComment = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const userId = user?._id as string | undefined;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
+
+    const { commentId } = req.params;
+
+    if (!mongoose.isValidObjectId(commentId)) {
+      return res.status(400).json({ message: "Invalid comment id" });
+    }
+
+    const { text } = req.body as CreateCommentDto;
+
+    if (!text || text.trim().length === 0) {
+      return res.status(400).json({ message: "Text is required" });
+    }
+
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    if (String(comment.owner) !== userId) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    comment.text = text.trim();
+    await comment.save();
+
+    const updatedComment = await Comment.findById(comment._id)
+      .populate("owner", "_id username image")
+      .select("_id postId owner text createdAt updatedAt");
+
+    return res.status(200).json(updatedComment);
+  } catch {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const deleteComment = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const userId = user?._id as string | undefined;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Access denied" });
+    }
+
+    const { commentId } = req.params;
+
+    if (!mongoose.isValidObjectId(commentId)) {
+      return res.status(400).json({ message: "Invalid comment id" });
+    }
+
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    if (String(comment.owner) !== userId) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    await Comment.findByIdAndDelete(commentId);
+
+    await Post.findByIdAndUpdate(comment.postId, {
+      $inc: { commentsCount: -1 },
+    });
+
+    return res.status(200).json({
+      message: "Comment deleted successfully",
+    });
+  } catch {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export default {
+  addComment,
+  getCommentsByPost,
+  updateComment,
+  deleteComment,
+};

@@ -75,4 +75,63 @@ router.post(
   commentController.addComment
 );
 
+/**
+ * @swagger
+ * /comments/{commentId}:
+ *   put:
+ *     summary: Update a comment
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - text
+ *             properties:
+ *               text:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Comment updated successfully
+ */
+router.put(
+  "/comments/:commentId",
+  authMiddleware,
+  commentController.updateComment
+);
+
+/**
+ * @swagger
+ * /comments/{commentId}:
+ *   delete:
+ *     summary: Delete a comment
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Comment deleted successfully
+ */
+router.delete(
+  "/comments/:commentId",
+  authMiddleware,
+  commentController.deleteComment
+);
+
 export default router;
