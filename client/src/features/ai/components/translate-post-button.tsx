@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react";
 import { translatePostText } from "../api/translate-post-text";
+import { getErrorMessage } from "../../../utils/get-error-message";
 
 type TranslatePostButtonProps = {
   postId: string;
@@ -35,7 +36,7 @@ export const TranslatePostButton = ({
       setDetectedSourceLanguage(response.detectedSourceLanguage ?? "");
       setIsShowingTranslation(true);
     } catch (error: unknown) {
-      setErrorMessage("Translation failed. Please try again later.");
+      setErrorMessage(getErrorMessage(error, "AI translate failed"));
     } finally {
       setIsLoading(false);
     }
