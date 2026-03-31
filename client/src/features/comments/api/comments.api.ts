@@ -22,3 +22,19 @@ export async function createComment(postId: string, text: string) {
 
   return res.data;
 }
+
+export async function updateComment(commentId: string, text: string) {
+  const res = await apiClient.put<Comment>(`/comments/${commentId}`, {
+    text,
+  });
+
+  return res.data;
+}
+
+export async function deleteComment(commentId: string) {
+  const res = await apiClient.delete<{ message: string }>(
+    `/comments/${commentId}`
+  );
+
+  return res.data;
+}
