@@ -30,7 +30,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
-app.use("/ ", commentRoutes);
+app.use("/", commentRoutes);
 app.use("/ai", aiRoutes);
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
