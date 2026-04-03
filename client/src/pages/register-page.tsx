@@ -110,7 +110,7 @@ type FeatureCardProps = {
   description: string;
 };
 
-function FeatureCard({ title, description }: FeatureCardProps) {
+const FeatureCard = ({ title, description }: FeatureCardProps) => {
   return (
     <Box
       minW="160px"
@@ -129,4 +129,4 @@ function FeatureCard({ title, description }: FeatureCardProps) {
       </Text>
     </Box>
   );
-}
+};

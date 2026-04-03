@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { Center, Spinner } from "@chakra-ui/react";
 import { useAuthStore } from "../store/auth.store";
 
-export function ProtectedRoute() {
+export const ProtectedRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isHydrated = useAuthStore((state) => state.isHydrated);
 
@@ -19,4 +19,4 @@ export function ProtectedRoute() {
   }
 
   return <Outlet />;
-}
+};

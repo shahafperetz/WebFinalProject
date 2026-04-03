@@ -1,19 +1,19 @@
 import { apiClient } from "../../../api/client";
 
-export async function getMyInfo() {
+export const getMyInfo = async () => {
   const res = await apiClient.get("/users/myInfo");
   return res.data;
-}
+};
 
-export async function getUserById(id: string) {
+export const getUserById = async (id: string) => {
   const res = await apiClient.get(`/users/${id}`);
   return res.data;
-}
+};
 
-export async function updateMyInfo(data: {
+export const updateMyInfo = async (data: {
   username?: string;
   image?: File | null;
-}) {
+}) => {
   const formData = new FormData();
 
   if (typeof data.username === "string") {
@@ -31,4 +31,4 @@ export async function updateMyInfo(data: {
   });
 
   return res.data;
-}
+};

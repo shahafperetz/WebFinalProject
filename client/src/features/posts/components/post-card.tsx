@@ -168,8 +168,6 @@ export const PostCard = ({ post }: PostCardProps) => {
           ) : null}
         </HStack>
 
-        <Text>{post.text}</Text>
-
         {postImageUrl ? (
           <Box overflow="hidden" borderRadius="xl">
             <Image
@@ -181,6 +179,12 @@ export const PostCard = ({ post }: PostCardProps) => {
             />
           </Box>
         ) : null}
+
+        <VStack align="stretch" gap={2}>
+          <Text>{post.text}</Text>
+
+          <TranslatePostButton postId={post._id} originalText={post.text} />
+        </VStack>
 
         <HStack gap={3}>
           <Button
@@ -199,8 +203,6 @@ export const PostCard = ({ post }: PostCardProps) => {
               Comments ({post.commentsCount})
             </RouterLink>
           </Button>
-
-          <TranslatePostButton postId={post._id} originalText={post.text} />
         </HStack>
       </Card.Body>
     </Card.Root>

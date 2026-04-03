@@ -2,7 +2,7 @@ import { Box } from "@chakra-ui/react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../hooks/use-auth";
 
-export function GoogleLoginButton() {
+export const GoogleLoginButton = () => {
   const { googleLoginMutation } = useAuth();
 
   return (
@@ -18,4 +18,4 @@ export function GoogleLoginButton() {
       />
     </Box>
   );
-}
+};
