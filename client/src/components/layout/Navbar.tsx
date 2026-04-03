@@ -20,7 +20,7 @@ type NavButtonProps = {
   colorPalette?: string;
 };
 
-function NavButton({ to, children, colorPalette }: NavButtonProps) {
+const NavButton = ({ to, children, colorPalette }: NavButtonProps) => {
   return (
     <NavLink to={to}>
       {({ isActive }) => (
@@ -33,9 +33,9 @@ function NavButton({ to, children, colorPalette }: NavButtonProps) {
       )}
     </NavLink>
   );
-}
+};
 
-export function Navbar() {
+export const Navbar = () => {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { logoutMutation } = useAuth();
@@ -113,4 +113,4 @@ export function Navbar() {
       </Flex>
     </Box>
   );
-}
+};

@@ -64,7 +64,7 @@ export const TranslatePostButton = ({
         </Button>
 
         {translatedText ? (
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="gray.600">
             {detectedSourceLanguage
               ? `${detectedSourceLanguage} → English`
               : "Translated to English"}

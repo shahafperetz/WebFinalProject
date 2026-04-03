@@ -4,7 +4,11 @@ import type {
   PaginatedCommentsResponse,
 } from "../types/comment.types";
 
-export async function getCommentsByPost(postId: string, skip = 0, limit = 20) {
+export const getCommentsByPost = async (
+  postId: string,
+  skip = 0,
+  limit = 20
+) => {
   const res = await apiClient.get<PaginatedCommentsResponse>(
     `/posts/${postId}/comments`,
     {
@@ -13,28 +17,28 @@ export async function getCommentsByPost(postId: string, skip = 0, limit = 20) {
   );
 
   return res.data;
-}
+};
 
-export async function createComment(postId: string, text: string) {
+export const createComment = async (postId: string, text: string) => {
   const res = await apiClient.post<Comment>(`/posts/${postId}/comments`, {
     text,
   });
 
   return res.data;
-}
+};
 
-export async function updateComment(commentId: string, text: string) {
+export const updateComment = async (commentId: string, text: string) => {
   const res = await apiClient.put<Comment>(`/comments/${commentId}`, {
     text,
   });
 
   return res.data;
-}
+};
 
-export async function deleteComment(commentId: string) {
+export const deleteComment = async (commentId: string) => {
   const res = await apiClient.delete<{ message: string }>(
     `/comments/${commentId}`
   );
 
   return res.data;
-}
+};

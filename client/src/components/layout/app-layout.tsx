@@ -1,8 +1,8 @@
 import { Box, Container } from "@chakra-ui/react";
 import { Outlet, useLocation } from "react-router-dom";
-import { Navbar } from "./navbar";
+import { Navbar } from "./Navbar";
 
-export function AppLayout() {
+export const AppLayout = () => {
   const location = useLocation();
 
   const hideNavbar =
@@ -17,4 +17,4 @@ export function AppLayout() {
       </Container>
     </Box>
   );
-}
+};
