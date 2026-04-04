@@ -1,14 +1,15 @@
 import {
   Box,
-  Button,
   Container,
   Heading,
   HStack,
+  Image,
   Separator,
   Text,
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
+import { FileText, MessageCircle, Sparkles } from "lucide-react";
 import { LoginForm } from "../features/auth/components/login-form";
 import { GoogleLoginButton } from "../features/auth/components/google-login-button";
 
@@ -25,24 +26,39 @@ export const LoginPage = () => {
             flex="1"
             align="start"
             justify="center"
-            gap={6}
+            gap={8}
             px={{ base: 2, md: 4 }}
           >
+            <HStack gap={3}>
+              <Image
+                src="/social-ai.svg"
+                alt="Social AI"
+                boxSize="48px"
+                borderRadius="full"
+              />
+              <Heading size="xl" color="blue.600">
+                Social AI
+              </Heading>
+            </HStack>
+
             <Box>
               <Heading
                 size={{ base: "2xl", md: "3xl" }}
                 lineHeight="1.1"
-                color="blue.600"
+                color="gray.800"
               >
-                Social AI App
+                Share. Discover.{" "}
+                <Box as="span" color="blue.500">
+                  Connect.
+                </Box>
               </Heading>
 
               <Text
                 mt={4}
-                fontSize={{ base: "lg", md: "2xl" }}
-                color="gray.700"
-                maxW="560px"
-                lineHeight="1.5"
+                fontSize={{ base: "md", md: "lg" }}
+                color="gray.500"
+                maxW="480px"
+                lineHeight="1.7"
               >
                 Share posts, discover content, and interact with your community
                 in one smart social platform.
@@ -54,9 +70,24 @@ export const LoginPage = () => {
               flexWrap="wrap"
               display={{ base: "none", md: "flex" }}
             >
-              <FeatureCard title="Posts" description="Share text and images" />
-              <FeatureCard title="Comments" description="Join the discussion" />
-              <FeatureCard title="AI" description="Search content smartly" />
+              <FeatureCard
+                icon={<FileText size={18} />}
+                title="Posts"
+                description="Share text and images"
+                color="blue"
+              />
+              <FeatureCard
+                icon={<MessageCircle size={18} />}
+                title="Comments"
+                description="Join the discussion"
+                color="green"
+              />
+              <FeatureCard
+                icon={<Sparkles size={18} />}
+                title="AI Search"
+                description="Find content smartly"
+                color="purple"
+              />
             </HStack>
           </VStack>
 
@@ -78,21 +109,36 @@ export const LoginPage = () => {
             >
               <VStack align="stretch" gap={5}>
                 <Box textAlign="center">
-                  <Heading size="lg">Login</Heading>
-                  <Text mt={2} color="gray.600">
-                    Sign in to continue to the application
+                  <Heading size="lg">Welcome back</Heading>
+                  <Text mt={1.5} color="gray.500" fontSize="sm">
+                    Sign in to continue to Social AI
                   </Text>
                 </Box>
 
                 <LoginForm />
 
+                <HStack gap={3} align="center">
+                  <Separator flex="1" />
+                  <Text fontSize="xs" color="gray.400" flexShrink={0}>
+                    or continue with
+                  </Text>
+                  <Separator flex="1" />
+                </HStack>
+
                 <GoogleLoginButton />
 
                 <Separator />
 
-                <Button asChild size="lg" variant="outline" colorPalette="blue">
-                  <RouterLink to="/register">Create new account</RouterLink>
-                </Button>
+                <Box textAlign="center">
+                  <Text fontSize="sm" color="gray.500">
+                    Don't have an account?{" "}
+                    <RouterLink to="/register">
+                      <Box as="span" color="blue.500" fontWeight="semibold">
+                        Create one free
+                      </Box>
+                    </RouterLink>
+                  </Text>
+                </Box>
               </VStack>
             </Box>
           </Box>
@@ -103,14 +149,23 @@ export const LoginPage = () => {
 };
 
 type FeatureCardProps = {
+  icon: React.ReactNode;
   title: string;
   description: string;
+  color: "blue" | "green" | "purple";
 };
 
-const FeatureCard = ({ title, description }: FeatureCardProps) => {
+const colorMap = {
+  blue: { bg: "blue.50", icon: "blue.500" },
+  green: { bg: "green.50", icon: "green.500" },
+  purple: { bg: "purple.50", icon: "purple.500" },
+};
+
+const FeatureCard = ({ icon, title, description, color }: FeatureCardProps) => {
+  const c = colorMap[color];
   return (
     <Box
-      minW="160px"
+      minW="150px"
       p={4}
       bg="white"
       borderRadius="xl"
@@ -118,10 +173,23 @@ const FeatureCard = ({ title, description }: FeatureCardProps) => {
       border="1px solid"
       borderColor="gray.200"
     >
-      <Text fontWeight="bold" color="gray.800">
+      <Box
+        w="36px"
+        h="36px"
+        bg={c.bg}
+        color={c.icon}
+        borderRadius="lg"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        mb={3}
+      >
+        {icon}
+      </Box>
+      <Text fontWeight="semibold" fontSize="sm" color="gray.800">
         {title}
       </Text>
-      <Text mt={1} fontSize="sm" color="gray.600">
+      <Text mt={0.5} fontSize="xs" color="gray.500">
         {description}
       </Text>
     </Box>

@@ -14,58 +14,70 @@ export const LoginForm = () => {
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
+    defaultValues: { username: "", password: "" },
   });
 
   const onSubmit = (values: LoginFormValues) => {
     loginMutation.mutate(values);
   };
 
-  const errorMessage = getErrorMessage(loginMutation.error, "Login failed");
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4}>
-        {loginMutation.isError ? (
-          <Alert.Root status="error" borderRadius="xl">
+        {loginMutation.isError && (
+          <Alert.Root status="error" borderRadius="xl" fontSize="sm">
             <Alert.Indicator />
             <Alert.Content>
-              <Alert.Title>Login failed</Alert.Title>
-              <Alert.Description>{errorMessage}</Alert.Description>
+              <Alert.Description>
+                {getErrorMessage(
+                  loginMutation.error,
+                  "Login failed. Please check your credentials."
+                )}
+              </Alert.Description>
             </Alert.Content>
           </Alert.Root>
-        ) : null}
+        )}
 
         <Field.Root invalid={!!errors.username}>
-          <Field.Label>Username</Field.Label>
+          <Field.Label fontSize="sm" fontWeight="medium" color="gray.700">
+            Username
+          </Field.Label>
           <Input
             size="lg"
             placeholder="Enter your username"
+            borderRadius="xl"
             {...register("username")}
           />
-          <Field.ErrorText>{errors.username?.message}</Field.ErrorText>
+          <Field.ErrorText fontSize="xs">
+            {errors.username?.message}
+          </Field.ErrorText>
         </Field.Root>
 
         <Field.Root invalid={!!errors.password}>
-          <Field.Label>Password</Field.Label>
+          <Field.Label fontSize="sm" fontWeight="medium" color="gray.700">
+            Password
+          </Field.Label>
           <Input
             size="lg"
             type="password"
             placeholder="Enter your password"
+            borderRadius="xl"
             {...register("password")}
           />
-          <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+          <Field.ErrorText fontSize="xs">
+            {errors.password?.message}
+          </Field.ErrorText>
         </Field.Root>
 
         <Button
           type="submit"
           size="lg"
           colorPalette="blue"
+          borderRadius="xl"
           loading={loginMutation.isPending}
+          mt={1}
         >
-          Login
+          Sign in
         </Button>
       </Stack>
     </form>

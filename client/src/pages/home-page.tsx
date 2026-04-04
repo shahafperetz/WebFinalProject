@@ -15,10 +15,7 @@ export const HomePage = () => {
 
   return (
     <VStack align="stretch" gap={6}>
-      <PageHeader
-        title="Home Feed"
-        subtitle="Browse posts and search them with AI"
-      />
+      <PageHeader title="Home Feed" />
 
       {isShowingAiResults ? (
         <Alert.Root status="info" borderRadius="xl">

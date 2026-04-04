@@ -15,82 +15,78 @@ import { EditCommentForm } from "./edit-comment-form";
 import type { Comment } from "../types/comment.types";
 import { getImageUrl } from "../../../utils/get-image-url";
 
-type Props = {
-  comment: Comment;
-};
+type Props = { comment: Comment };
 
 export const CommentCard = ({ comment }: Props) => {
   const currentUser = useAuthStore((state) => state.user);
   const deleteCommentMutation = useDeleteComment();
-
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  const isOwner =
-    currentUser?._id === comment.owner?._id ||
-    currentUser?.id === comment.owner?._id;
+  const isOwner = currentUser?._id === comment.owner?._id;
 
   const avatarUrl = getImageUrl(comment.owner?.image);
 
   const handleDeleteConfirm = () => {
     deleteCommentMutation.mutate(
-      {
-        commentId: comment._id,
-        postId: comment.postId,
-      },
-      {
-        onSuccess: () => {
-          setIsDeleteOpen(false);
-        },
-      }
+      { commentId: comment._id, postId: comment.postId },
+      { onSuccess: () => setIsDeleteOpen(false) }
     );
   };
 
   return (
-    <Card.Root borderRadius="xl">
-      <Card.Body>
+    <Card.Root borderRadius="xl" border="1px solid" borderColor="gray.100">
+      <Card.Body py={4} px={5}>
         <HStack align="start" justify="space-between">
-          <HStack align="start" gap={3}>
-            <Avatar.Root>
+          <HStack align="start" gap={3} flex="1">
+            <Avatar.Root
+              size="sm"
+              borderRadius="full"
+              overflow="hidden"
+              flexShrink={0}
+            >
               {avatarUrl ? <Avatar.Image src={avatarUrl} /> : null}
               <Avatar.Fallback name={comment.owner?.username ?? "User"} />
             </Avatar.Root>
 
-            <VStack align="start" gap={1} flex="1">
-              <Text fontWeight="bold">
-                {comment.owner?.username ?? "Unknown user"}
-              </Text>
-
-              <Text>{comment.text}</Text>
-
-              <Text fontSize="sm" color="gray.500">
-                {new Date(comment.createdAt).toLocaleString()}
+            <VStack align="start" gap={0.5} flex="1">
+              <HStack gap={2}>
+                <Text fontWeight="semibold" fontSize="sm">
+                  {comment.owner?.username ?? "Unknown user"}
+                </Text>
+                <Text fontSize="xs" color="gray.400">
+                  {new Date(comment.createdAt).toLocaleString()}
+                </Text>
+              </HStack>
+              <Text fontSize="sm" color="gray.700" lineHeight="1.6">
+                {comment.text}
               </Text>
             </VStack>
           </HStack>
 
-          {isOwner ? (
-            <HStack>
+          {isOwner && (
+            <HStack gap={1} flexShrink={0}>
               <Dialog.Root
                 open={isEditOpen}
                 onOpenChange={(e) => setIsEditOpen(e.open)}
               >
                 <Dialog.Trigger asChild>
-                  <Button size="sm" variant="ghost" aria-label="Edit comment">
-                    <HStack gap={2}>
-                      <Pencil size={16} />
-                      <span>Edit</span>
-                    </HStack>
+                  <Button
+                    size="xs"
+                    variant="ghost"
+                    aria-label="Edit comment"
+                    color="gray.400"
+                    _hover={{ color: "blue.500", bg: "blue.50" }}
+                  >
+                    <Pencil size={14} />
                   </Button>
                 </Dialog.Trigger>
-
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                  <Dialog.Content>
+                  <Dialog.Content borderRadius="2xl">
                     <Dialog.Header>
                       <Dialog.Title>Edit Comment</Dialog.Title>
                     </Dialog.Header>
-
                     <Dialog.Body>
                       <EditCommentForm
                         commentId={comment._id}
@@ -99,7 +95,6 @@ export const CommentCard = ({ comment }: Props) => {
                         onSuccess={() => setIsEditOpen(false)}
                       />
                     </Dialog.Body>
-
                     <Dialog.CloseTrigger />
                   </Dialog.Content>
                 </Dialog.Positioner>
@@ -111,29 +106,26 @@ export const CommentCard = ({ comment }: Props) => {
               >
                 <Dialog.Trigger asChild>
                   <Button
-                    size="sm"
+                    size="xs"
                     variant="ghost"
-                    colorPalette="red"
                     aria-label="Delete comment"
+                    color="gray.400"
+                    _hover={{ color: "red.500", bg: "red.50" }}
                   >
-                    <HStack gap={2}>
-                      <Trash2 size={16} />
-                      <span>Delete</span>
-                    </HStack>
+                    <Trash2 size={14} />
                   </Button>
                 </Dialog.Trigger>
-
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                  <Dialog.Content>
+                  <Dialog.Content borderRadius="2xl">
                     <Dialog.Header>
                       <Dialog.Title>Delete Comment</Dialog.Title>
                     </Dialog.Header>
-
                     <Dialog.Body>
-                      <Text>Are you sure you want to delete this comment?</Text>
+                      <Text color="gray.600">
+                        Are you sure you want to delete this comment?
+                      </Text>
                     </Dialog.Body>
-
                     <Dialog.Footer>
                       <Button
                         variant="outline"
@@ -141,7 +133,6 @@ export const CommentCard = ({ comment }: Props) => {
                       >
                         Cancel
                       </Button>
-
                       <Button
                         colorPalette="red"
                         onClick={handleDeleteConfirm}
@@ -150,13 +141,12 @@ export const CommentCard = ({ comment }: Props) => {
                         Delete
                       </Button>
                     </Dialog.Footer>
-
                     <Dialog.CloseTrigger />
                   </Dialog.Content>
                 </Dialog.Positioner>
               </Dialog.Root>
             </HStack>
-          ) : null}
+          )}
         </HStack>
       </Card.Body>
     </Card.Root>
