@@ -8,8 +8,8 @@ type PostsFeedSkeletonProps = {
 export const PostsFeedSkeleton = ({ count = 3 }: PostsFeedSkeletonProps) => {
   return (
     <VStack gap={6} align="stretch">
-      {Array.from({ length: count }).map((_, index) => (
-        <PostCardSkeleton key={index} />
+      {Array.from({ length: count }).map((_, i) => (
+        <PostCardSkeleton key={i} />
       ))}
     </VStack>
   );

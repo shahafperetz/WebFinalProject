@@ -5,14 +5,18 @@ import { Navbar } from "./Navbar";
 export const AppLayout = () => {
   const location = useLocation();
 
-  const hideNavbar =
+  const isAuthPage =
     location.pathname === "/login" || location.pathname === "/register";
 
   return (
     <Box minH="100vh" bg="gray.50">
-      {!hideNavbar ? <Navbar /> : null}
+      {!isAuthPage && <Navbar />}
 
-      <Container maxW="6xl" py={hideNavbar ? 0 : 8}>
+      <Container
+        maxW={isAuthPage ? "full" : "6xl"}
+        px={isAuthPage ? 0 : { base: 4, md: 6 }}
+        py={isAuthPage ? 0 : 8}
+      >
         <Outlet />
       </Container>
     </Box>

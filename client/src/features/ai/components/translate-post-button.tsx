@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react";
+import { Languages } from "lucide-react";
 import { translatePostText } from "../api/translate-post-text";
 import { getErrorMessage } from "../../../utils/get-error-message";
 
@@ -20,18 +21,14 @@ export const TranslatePostButton = ({
 
   const handleTranslateClick = async () => {
     if (!originalText.trim()) return;
-
     if (translatedText) {
-      setIsShowingTranslation((prev) => !prev);
+      setIsShowingTranslation((p) => !p);
       return;
     }
-
     try {
       setIsLoading(true);
       setErrorMessage("");
-
       const response = await translatePostText(postId);
-
       setTranslatedText(response.translatedText);
       setDetectedSourceLanguage(response.detectedSourceLanguage ?? "");
       setIsShowingTranslation(true);
@@ -48,50 +45,57 @@ export const TranslatePostButton = ({
     ? isShowingTranslation
       ? "Hide translation"
       : "Show translation"
-    : "Translate to English";
+    : "Translate";
 
   return (
     <VStack align="start" gap={2}>
-      <HStack gap={3} flexWrap="wrap">
+      <HStack gap={2} align="center">
         <Button
-          size="sm"
+          size="xs"
           variant="ghost"
           colorPalette="blue"
+          borderRadius="full"
+          px={3}
           onClick={handleTranslateClick}
           disabled={isLoading || !originalText.trim()}
+          color="blue.500"
+          _hover={{ bg: "blue.50" }}
         >
-          {buttonLabel}
+          <HStack gap={1}>
+            <Languages size={12} />
+            <Text fontSize="xs">{buttonLabel}</Text>
+          </HStack>
         </Button>
 
-        {translatedText ? (
-          <Text fontSize="sm" color="gray.600">
+        {translatedText && (
+          <Text fontSize="xs" color="gray.400">
             {detectedSourceLanguage
               ? `${detectedSourceLanguage} → English`
-              : "Translated to English"}
+              : "Translated"}
           </Text>
-        ) : null}
+        )}
       </HStack>
 
-      {isShowingTranslation && translatedText ? (
+      {isShowingTranslation && translatedText && (
         <Box
           w="full"
           p={3}
-          borderRadius="md"
-          bg="gray.50"
-          border="1px solid"
-          borderColor="gray.200"
+          borderRadius="xl"
+          bg="blue.50"
+          borderLeft="3px solid"
+          borderColor="blue.200"
         >
-          <Text fontSize="sm" color="gray.700">
+          <Text fontSize="sm" color="gray.700" lineHeight="1.6">
             {translatedText}
           </Text>
         </Box>
-      ) : null}
+      )}
 
-      {errorMessage ? (
-        <Text fontSize="sm" color="red.500">
+      {errorMessage && (
+        <Text fontSize="xs" color="red.400">
           {errorMessage}
         </Text>
-      ) : null}
+      )}
     </VStack>
   );
 };

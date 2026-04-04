@@ -1,4 +1,4 @@
-import { Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 
 type PageHeaderProps = {
   title: string;
@@ -7,9 +7,15 @@ type PageHeaderProps = {
 
 export const PageHeader = ({ title, subtitle }: PageHeaderProps) => {
   return (
-    <VStack align="start" gap={1} mb={6}>
-      <Heading>{title}</Heading>
-      {subtitle ? <Text color="gray.600">{subtitle}</Text> : null}
-    </VStack>
+    <Box mb={6}>
+      <Text fontSize="2xl" fontWeight="bold" color="gray.800">
+        {title}
+      </Text>
+      {subtitle && (
+        <Text color="gray.500" fontSize="sm" mt={0.5}>
+          {subtitle}
+        </Text>
+      )}
+    </Box>
   );
 };

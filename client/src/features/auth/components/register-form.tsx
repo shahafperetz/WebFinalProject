@@ -31,72 +31,93 @@ export const RegisterForm = () => {
     registerMutation.mutate(payload);
   };
 
-  const errorMessage = getErrorMessage(
-    registerMutation.error,
-    "Registration failed"
-  );
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4}>
-        {registerMutation.isError ? (
-          <Alert.Root status="error" borderRadius="xl">
+        {registerMutation.isError && (
+          <Alert.Root status="error" borderRadius="xl" fontSize="sm">
             <Alert.Indicator />
             <Alert.Content>
-              <Alert.Title>Registration failed</Alert.Title>
-              <Alert.Description>{errorMessage}</Alert.Description>
+              <Alert.Description>
+                {getErrorMessage(
+                  registerMutation.error,
+                  "Registration failed. Please try again."
+                )}
+              </Alert.Description>
             </Alert.Content>
           </Alert.Root>
-        ) : null}
+        )}
 
         <Field.Root invalid={!!errors.username}>
-          <Field.Label>Username</Field.Label>
+          <Field.Label fontSize="sm" fontWeight="medium" color="gray.700">
+            Username
+          </Field.Label>
           <Input
             size="lg"
             placeholder="Choose a username"
+            borderRadius="xl"
             {...register("username")}
           />
-          <Field.ErrorText>{errors.username?.message}</Field.ErrorText>
+          <Field.ErrorText fontSize="xs">
+            {errors.username?.message}
+          </Field.ErrorText>
         </Field.Root>
 
         <Field.Root invalid={!!errors.email}>
-          <Field.Label>Email</Field.Label>
+          <Field.Label fontSize="sm" fontWeight="medium" color="gray.700">
+            Email
+          </Field.Label>
           <Input
             size="lg"
             type="email"
             placeholder="Enter your email"
+            borderRadius="xl"
             {...register("email")}
           />
-          <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
+          <Field.ErrorText fontSize="xs">
+            {errors.email?.message}
+          </Field.ErrorText>
         </Field.Root>
 
         <Field.Root invalid={!!errors.password}>
-          <Field.Label>Password</Field.Label>
+          <Field.Label fontSize="sm" fontWeight="medium" color="gray.700">
+            Password
+          </Field.Label>
           <Input
             size="lg"
             type="password"
             placeholder="Create a password"
+            borderRadius="xl"
             {...register("password")}
           />
-          <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+          <Field.ErrorText fontSize="xs">
+            {errors.password?.message}
+          </Field.ErrorText>
         </Field.Root>
 
         <Field.Root invalid={!!errors.confirmPassword}>
-          <Field.Label>Confirm Password</Field.Label>
+          <Field.Label fontSize="sm" fontWeight="medium" color="gray.700">
+            Confirm Password
+          </Field.Label>
           <Input
             size="lg"
             type="password"
             placeholder="Repeat your password"
+            borderRadius="xl"
             {...register("confirmPassword")}
           />
-          <Field.ErrorText>{errors.confirmPassword?.message}</Field.ErrorText>
+          <Field.ErrorText fontSize="xs">
+            {errors.confirmPassword?.message}
+          </Field.ErrorText>
         </Field.Root>
 
         <Button
           type="submit"
           size="lg"
           colorPalette="blue"
+          borderRadius="xl"
           loading={registerMutation.isPending}
+          mt={1}
         >
           Create Account
         </Button>

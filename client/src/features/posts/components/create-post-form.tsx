@@ -5,13 +5,13 @@ import {
   Button,
   Field,
   Image,
-  Input,
   Stack,
   Textarea,
+  Text,
   VStack,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { createPost } from "../api/posts.api.ts";
 import {
@@ -32,6 +32,8 @@ export const CreatePostForm = () => {
   const queryClient = useQueryClient();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imageError, setImageError] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   const previewUrl = useMemo(() => {
@@ -46,9 +48,7 @@ export const CreatePostForm = () => {
     formState: { errors },
   } = useForm<CreatePostFormValues>({
     resolver: zodResolver(createPostSchema),
-    defaultValues: {
-      text: "",
-    },
+    defaultValues: { text: "" },
   });
 
   const createPostMutation = useMutation({
@@ -59,21 +59,31 @@ export const CreatePostForm = () => {
       setImageError("");
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
       await queryClient.invalidateQueries({ queryKey: ["my-posts"] });
-
       navigate("/");
     },
   });
+
+  const handleFile = (file: File | null) => {
+    if (!file) {
+      setSelectedImage(null);
+      setImageError("");
+      return;
+    }
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setSelectedImage(null);
+      setImageError("Only image files (.jpg, .jpeg, .png, .webp) are allowed.");
+      return;
+    }
+    setImageError("");
+    setSelectedImage(file);
+  };
 
   const onSubmit = (values: CreatePostFormValues) => {
     if (selectedImage && !ALLOWED_IMAGE_TYPES.includes(selectedImage.type)) {
       setImageError("Only image files (.jpg, .jpeg, .png, .webp) are allowed.");
       return;
     }
-
-    createPostMutation.mutate({
-      text: values.text,
-      image: selectedImage,
-    });
+    createPostMutation.mutate({ text: values.text, image: selectedImage });
   };
 
   return (
@@ -114,31 +124,64 @@ export const CreatePostForm = () => {
 
           <Field.Root invalid={!!imageError}>
             <Field.Label>Upload image</Field.Label>
-            <Input
+
+            <input
+              ref={fileInputRef}
               type="file"
               accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-              p={1}
-              onChange={(e) => {
-                const file = e.target.files?.[0] ?? null;
-
-                if (!file) {
-                  setSelectedImage(null);
-                  setImageError("");
-                  return;
-                }
-
-                if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-                  setSelectedImage(null);
-                  setImageError(
-                    "Only image files (.jpg, .jpeg, .png, .webp) are allowed."
-                  );
-                  return;
-                }
-
-                setImageError("");
-                setSelectedImage(file);
-              }}
+              style={{ display: "none" }}
+              onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
             />
+
+            {!previewUrl && (
+              <Box
+                w="full"
+                border="2px dashed"
+                borderColor={
+                  isDragging ? "blue.400" : imageError ? "red.300" : "gray.300"
+                }
+                borderRadius="xl"
+                bg={isDragging ? "blue.50" : "gray.50"}
+                p={8}
+                textAlign="center"
+                cursor="pointer"
+                transition="all 0.2s"
+                _hover={{ borderColor: "blue.400", bg: "blue.50" }}
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  handleFile(e.dataTransfer.files?.[0] ?? null);
+                }}
+              >
+                <VStack gap={2}>
+                  <Box
+                    fontSize="2xl"
+                    color={isDragging ? "blue.400" : "gray.400"}
+                  >
+                    ↑
+                  </Box>
+                  <Text fontWeight="medium" color="gray.600" fontSize="sm">
+                    Drag & drop an image here
+                  </Text>
+                  <Text color="gray.400" fontSize="xs">
+                    or{" "}
+                    <Text as="span" color="blue.500" fontWeight="medium">
+                      click to browse
+                    </Text>
+                  </Text>
+                  <Text color="gray.400" fontSize="xs">
+                    JPG, PNG, WEBP supported
+                  </Text>
+                </VStack>
+              </Box>
+            )}
+
             <Field.ErrorText>{imageError}</Field.ErrorText>
           </Field.Root>
 
@@ -149,16 +192,18 @@ export const CreatePostForm = () => {
                   src={previewUrl}
                   alt="Selected preview"
                   maxH="320px"
+                  w="full"
                   objectFit="cover"
                 />
               </Box>
-
               <Button
                 size="sm"
                 variant="ghost"
+                colorPalette="red"
                 onClick={() => {
                   setSelectedImage(null);
                   setImageError("");
+                  if (fileInputRef.current) fileInputRef.current.value = "";
                 }}
               >
                 Remove image

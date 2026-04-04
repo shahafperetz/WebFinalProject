@@ -7,15 +7,19 @@ type Props = {
 };
 
 export const CommentsList = ({ comments }: Props) => {
-  if (!comments.length) {
-    return <Text color="gray.500">No comments yet</Text>;
-  }
+  if (!comments.length) return null;
 
   return (
-    <VStack align="stretch" gap={4}>
-      {comments.map((comment) => (
-        <CommentCard key={comment._id} comment={comment} />
-      ))}
+    <VStack align="stretch" gap={3}>
+      <Text fontSize="sm" fontWeight="medium" color="gray.500">
+        {comments.length} comment{comments.length === 1 ? "" : "s"}
+      </Text>
+
+      <VStack align="stretch" gap={3}>
+        {comments.map((comment) => (
+          <CommentCard key={comment._id} comment={comment} />
+        ))}
+      </VStack>
     </VStack>
   );
 };
