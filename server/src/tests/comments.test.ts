@@ -58,15 +58,42 @@ describe("Comments API", () => {
     const feedRes = await request(app).get("/posts?skip=0&limit=10");
     expect(feedRes.statusCode).toBe(200);
 
-    const found = feedRes.body.items.find((p: any) => String(p._id) === String(postId));
+    const found = feedRes.body.items.find(
+      (p: any) => String(p._id) === String(postId)
+    );
+
     expect(found).toBeDefined();
     expect(found.commentsCount).toBeGreaterThanOrEqual(1);
   });
 
+  test("POST /posts/:postId/comments fails without token", async () => {
+    const res = await request(app)
+      .post(`/posts/${postId}/comments`)
+      .send({ text: "unauthorized comment" });
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  test("POST /posts/:postId/comments fails without text", async () => {
+    const res = await request(app)
+      .post(`/posts/${postId}/comments`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({});
+
+    expect(res.statusCode).toBe(400);
+  });
+
   test("GET /posts/:postId/comments returns comments list", async () => {
     const res = await request(app).get(`/posts/${postId}/comments?skip=0&limit=10`);
+
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body.items)).toBe(true);
     expect(res.body.items.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test("GET /posts/:postId/comments returns 400 for invalid post id", async () => {
+    const res = await request(app).get("/posts/123/comments");
+
+    expect(res.statusCode).toBe(400);
   });
 });

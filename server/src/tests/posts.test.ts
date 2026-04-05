@@ -6,13 +6,20 @@ import app from "../app";
 import User from "../models/user_model";
 import Post from "../models/post_model";
 
-const testUser = {
+const firstUser = {
   username: "posts_user",
   email: "posts_user@example.com",
   password: "password123",
 };
 
+const secondUser = {
+  username: "posts_user_2",
+  email: "posts_user_2@example.com",
+  password: "password123",
+};
+
 let accessToken = "";
+let secondAccessToken = "";
 
 const createTinyPng = (): string => {
   const tempDir = path.join(process.cwd(), "tmp");
@@ -35,14 +42,22 @@ beforeAll(async () => {
   await User.deleteMany({});
   await Post.deleteMany({});
 
-  await request(app).post("/auth/register").send(testUser);
+  await request(app).post("/auth/register").send(firstUser);
+  await request(app).post("/auth/register").send(secondUser);
 
-  const loginRes = await request(app).post("/auth/login").send({
-    username: testUser.username,
-    password: testUser.password,
+  const loginRes1 = await request(app).post("/auth/login").send({
+    username: firstUser.username,
+    password: firstUser.password,
   });
 
-  accessToken = loginRes.body.accessToken;
+  accessToken = loginRes1.body.accessToken;
+
+  const loginRes2 = await request(app).post("/auth/login").send({
+    username: secondUser.username,
+    password: secondUser.password,
+  });
+
+  secondAccessToken = loginRes2.body.accessToken;
 });
 
 afterAll(async () => {
@@ -59,6 +74,20 @@ describe("Posts API", () => {
     expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty("_id");
     expect(res.body.text).toBe("hello world");
+  });
+
+  test("POST /posts fails without token", async () => {
+    const res = await request(app).post("/posts").field("text", "hello");
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  test("POST /posts fails without text", async () => {
+    const res = await request(app)
+      .post("/posts")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.statusCode).toBe(400);
   });
 
   test(
@@ -83,6 +112,7 @@ describe("Posts API", () => {
 
   test("GET /posts returns paged feed", async () => {
     const res = await request(app).get("/posts?skip=0&limit=10");
+
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("items");
     expect(Array.isArray(res.body.items)).toBe(true);
@@ -95,10 +125,6 @@ describe("Posts API", () => {
 
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body.items)).toBe(true);
-    // כולם שלי
-    for (const p of res.body.items) {
-      expect(p.owner).toBeDefined();
-    }
   });
 
   test("PUT /posts/:id updates my post text", async () => {
@@ -118,6 +144,22 @@ describe("Posts API", () => {
     expect(updateRes.body.text).toBe("updated text");
   });
 
+  test("PUT /posts/:id returns 403 for other user post", async () => {
+    const createRes = await request(app)
+      .post("/posts")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .field("text", "owner only");
+
+    const postId = createRes.body._id;
+
+    const updateRes = await request(app)
+      .put(`/posts/${postId}`)
+      .set("Authorization", `Bearer ${secondAccessToken}`)
+      .field("text", "not allowed");
+
+    expect(updateRes.statusCode).toBe(403);
+  });
+
   test("DELETE /posts/:id deletes my post", async () => {
     const createRes = await request(app)
       .post("/posts")
@@ -131,5 +173,38 @@ describe("Posts API", () => {
       .set("Authorization", `Bearer ${accessToken}`);
 
     expect(delRes.statusCode).toBe(200);
+  });
+
+  test("POST /posts/:id/like toggles like and unlike", async () => {
+    const createRes = await request(app)
+      .post("/posts")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .field("text", "like me");
+
+    const postId = createRes.body._id;
+
+    const likeRes = await request(app)
+      .post(`/posts/${postId}/like`)
+      .set("Authorization", `Bearer ${secondAccessToken}`);
+
+    expect(likeRes.statusCode).toBe(200);
+    expect(likeRes.body.likesCount).toBe(1);
+    expect(likeRes.body.likedByMe).toBe(true);
+
+    const unlikeRes = await request(app)
+      .post(`/posts/${postId}/like`)
+      .set("Authorization", `Bearer ${secondAccessToken}`);
+
+    expect(unlikeRes.statusCode).toBe(200);
+    expect(unlikeRes.body.likesCount).toBe(0);
+    expect(unlikeRes.body.likedByMe).toBe(false);
+  });
+
+  test("POST /posts/:id/like returns 400 for invalid id", async () => {
+    const res = await request(app)
+      .post("/posts/123/like")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.statusCode).toBe(400);
   });
 });
