@@ -11,7 +11,14 @@ const testUser = {
   password: "password123",
 };
 
+const secondUser = {
+  username: "user2",
+  email: "user2@example.com",
+  password: "password123",
+};
+
 let accessToken = "";
+let userId = "";
 
 beforeAll(async () => {
   const mongoUrl =
@@ -23,6 +30,7 @@ beforeAll(async () => {
   await User.deleteMany({});
 
   await request(app).post("/auth/register").send(testUser);
+  await request(app).post("/auth/register").send(secondUser);
 
   const loginRes = await request(app).post("/auth/login").send({
     username: testUser.username,
@@ -30,6 +38,9 @@ beforeAll(async () => {
   });
 
   accessToken = loginRes.body.accessToken;
+
+  const me = await User.findOne({ username: testUser.username });
+  userId = String(me?._id);
 });
 
 afterAll(async () => {
@@ -42,13 +53,31 @@ describe("Users API", () => {
       .get("/users/myInfo")
       .set("Authorization", `Bearer ${accessToken}`);
 
-    if (res.statusCode !== 200) {
-      console.log("GET myInfo FAIL:", res.statusCode, res.text);
-    }
-
     expect(res.statusCode).toBe(200);
     expect(res.body.username).toBe(testUser.username);
     expect(res.body).toHaveProperty("email");
+  });
+
+  test("GET /users/myInfo fails without token", async () => {
+    const res = await request(app).get("/users/myInfo");
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  test("GET /users/:id returns user profile", async () => {
+    const res = await request(app).get(`/users/${userId}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty("_id");
+    expect(res.body).toHaveProperty("username");
+  });
+
+  test("GET /users/:id returns 404 for missing user", async () => {
+    const missingId = new mongoose.Types.ObjectId().toString();
+
+    const res = await request(app).get(`/users/${missingId}`);
+
+    expect(res.statusCode).toBe(404);
   });
 
   test("PUT /users/myInfo updates username", async () => {
@@ -57,12 +86,17 @@ describe("Users API", () => {
       .set("Authorization", `Bearer ${accessToken}`)
       .field("username", "user1_new");
 
-    if (res.statusCode !== 200) {
-      console.log("PUT username FAIL:", res.statusCode, res.text);
-    }
-
     expect(res.statusCode).toBe(200);
     expect(res.body.username).toBe("user1_new");
+  });
+
+  test("PUT /users/myInfo fails when username already taken", async () => {
+    const res = await request(app)
+      .put("/users/myInfo")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .field("username", "user2");
+
+    expect(res.statusCode).toBe(400);
   });
 
   test(
@@ -73,21 +107,16 @@ describe("Users API", () => {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
-      // PNG אמיתי קטן (1x1)
       const pngBase64 =
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5G2uoAAAAASUVORK5CYII=";
 
-      const imgPath = path.join(tempDir, "test.png");
+      const imgPath = path.join(tempDir, "test-profile.png");
       fs.writeFileSync(imgPath, Buffer.from(pngBase64, "base64"));
 
       const res = await request(app)
         .put("/users/myInfo")
         .set("Authorization", `Bearer ${accessToken}`)
         .attach("image", imgPath);
-
-      if (res.statusCode !== 200) {
-        console.log("UPLOAD FAIL:", res.statusCode, res.text);
-      }
 
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("image");
