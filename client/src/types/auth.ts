@@ -1,4 +1,4 @@
-import type { User } from "./user";
+import type { User } from "../features/users/types/user.types";
 
 export type LoginDto = {
   email: string;
